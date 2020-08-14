@@ -1,0 +1,3 @@
+recursive-include data *
+include test.txt
+include data/**
