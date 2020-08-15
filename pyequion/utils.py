@@ -2,6 +2,7 @@ import commentjson as json
 import numba
 import numpy as np
 import json as json_base
+import copy
 
 class ClosingEquationType():
     """Type of closing equation
@@ -77,7 +78,7 @@ def check_validity_specie_tag_in_reaction_dict(k):
 
 def load_from_db(fname):
     if not isinstance(fname, str):
-        return fname
+        return copy.deepcopy(fname)
     "Open a json file as dict"
     with open(fname, 'r') as json_file:
         db = json.load(json_file)
