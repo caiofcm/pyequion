@@ -16,7 +16,7 @@ from .activity_coefficients import TypeActivityCalculation
 #     List = list
 #     Dict = dict #parei aqui
 from .utils_for_numba import create_nb_Dict, create_nb_List
-from .core import DEFAULT_DB_FILES, Dict, List
+from .core import DEFAULT_DB_FILES, Dict, List, SolutionResult
 from .properties_utils import Indexes_db, solve_with_exception, tags_db
 from .utils import ClosingEquationType
 
@@ -180,13 +180,13 @@ def create_equilibrium_from_reaction_and_species(reactions, species,
     # Database as dict to store the info:
     feed_compounds_List = create_nb_List(feed_compounds)
     element_mass_balance_List = create_nb_List(element_mass_balance)
-    print('bef', initial_feed_mass_balance)
+    # print('bef', initial_feed_mass_balance)
     initial_feed_mass_balance_List = create_nb_List(initial_feed_mass_balance)
-    print('aft')
+    # print('aft')
     fixed_elements_List = create_nb_List(fixed_elements)
 
     # database_files_Dict = create_nb_Dict(database_files) #species as py file
-    print('database_files_Dict')
+    # print('database_files_Dict')
     # database_files_Dict = create_nb_Dict({'dummy': 'dummy'}) #species as py file
 
     reactionsStorage = numbafy_list_dict_str_float_reaction_storage(reactions)
@@ -900,7 +900,10 @@ def format_reaction_list_as_latex_mhchem(reaction_list):
     return formatted
 
 def convert_as_latex_specie(reac, r):
-    coefstr = abs(reac[r]) if abs(reac[r]) > 1 else ''
+    if np.isclose(reac[r] % 1, 0):
+        coefstr = abs(int(reac[r])) if abs(int(reac[r])) > 1 else ''
+    else:
+        coefstr = abs(reac[r]) if abs(reac[r]) > 1 else ''
     tag_no_signal = re.sub(RX_NO_SIGNAL, '', r)
     charge = get_charge_of_specie(r)
     signal = '+' if charge > 0 else '-'
@@ -945,6 +948,16 @@ def display_reactions(sys_eq):
         print('Error to display the reactions in latex format: module Ipython not found')
         raise error
     latex_reactions = format_reaction_list_as_latex_mhchem(sys_eq.reactionsStorage)
+    [display(Math(r)) for r in latex_reactions];
+    return
+
+def ipython_display_reactions(sol: SolutionResult):
+    try:
+        from IPython.display import display, Math, Latex
+    except ImportError as error:
+        print('Error to display the reactions in latex format: module Ipython not found')
+        raise error
+    latex_reactions = format_reaction_list_as_latex_mhchem(sol.reactions)
     [display(Math(r)) for r in latex_reactions];
     return
 

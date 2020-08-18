@@ -6,7 +6,7 @@ from scipy import optimize
 
 from . import core
 from . import reactions_species_builder as rbuilder
-from .reactions_species_builder import display_reactions
+from .reactions_species_builder import display_reactions, ipython_display_reactions
 from . import utils
 from . import utils_api
 from .core import DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult
@@ -54,6 +54,9 @@ def solve_solution(comp_dict, reaction_system=None, TC=25.0,
         close_type = reaction_system.closing_equation_type
     else:
         close_type = close_type if  close_type is not None else ClosingEquationType.NONE
+
+    if isinstance(activity_model_type, str):
+        activity_model_type = TypeActivityCalculation(activity_model_type)
 
     ## Neutrality Checking:
     if not np.any(np.isnan(comps_vals)):

@@ -17,6 +17,11 @@ from . import utils_for_numba
 from . import utils
 from .utils_for_numba import create_nb_Dict, create_nb_List
 
+try:
+    from numba.experimental import jitclass
+except:
+    from numba import jitclass
+
 from . import PengRobinson #WILL FAIL WITH NUMBA
 
 # if os.getenv('NUMBA_DISABLE_JIT') != "1":
@@ -61,15 +66,15 @@ class FakeNb():
 d_int, d_scalar, d_iarray, d_array, d_matrix, d_nested, d_string = utils.initialize_dict_numbafied()
 
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    specs = [
+    specs_idx = [
         ('idx', numba.typeof(d_int)),
         ('s', numba.typeof(d_scalar)),
         ('a', numba.typeof(d_array)),
         ('m', numba.typeof(d_matrix)),
     ]
 else:
-    specs = []
-@numba.jitclass(specs)
+    specs_idx = []
+@jitclass(specs_idx)
 class IndexController():
     def __init__(self, species_tags=None, size=0):
         self.idx = {'size': size}
@@ -103,7 +108,7 @@ if os.getenv('NUMBA_DISABLE_JIT') != "1":
 ]
 else:
     specs = []
-@numba.jitclass(specs)
+@jitclass(specs)
 class Specie():
     "A chemical compound (ion, neutral, gas, solid)"
 
@@ -176,7 +181,7 @@ if os.getenv('NUMBA_DISABLE_JIT') != "1":
 #	REACTIONS DEFINITIONS
 #--------------------------------------------
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    specs = [
+    specs_reacs = [
     # ('idx_species__', numba.int64),
     # ('stoic_coefs', numba.float64),
     # ('constant_T_coefs', numba.float64),
@@ -194,9 +199,9 @@ if os.getenv('NUMBA_DISABLE_JIT') != "1":
     ('species_tags', numba.typeof(l_string)),
 ]
 else:
-    specs = []
+    specs_reacs = []
 
-@numba.jitclass(specs)
+# @jitclass(specs_reacs)
 class EqReaction():
     "A Chemical Reaction representation"
 
@@ -294,7 +299,7 @@ if os.getenv('NUMBA_DISABLE_JIT') == "1":
 #--------------------------------------------
 #	REACTIONS DEFINITIONS
 #--------------------------------------------
-@numba.jitclass([
+@jitclass([
     ('idx_species', numba.int64[:]),
     ('stoic_coefs', numba.float64[:]),
     ('idx_feed', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
@@ -423,7 +428,7 @@ if os.getenv('NUMBA_DISABLE_JIT') != "1":
     ]
 else:
     spec_result = []
-@numba.jitclass(spec_result)
+# @jitclass(spec_result)
 class SolutionResult():
     """Final equilibrium solution representation
 
@@ -482,9 +487,10 @@ class SolutionResult():
         pass
 if os.getenv('NUMBA_DISABLE_JIT') == "1":
     SolutionResult.class_type = FakeNb()
+    pass
 
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    specs = [
+    specs_eqsys = [
         ('c_feed', numba.float64),
         # Extra variables for equilibrium specific cases: to be more generic is a list of np.ndarray (it has to be an array)
         # Arguments in function is necessary for the jacobian, otherwise the jacobian would need to be generated for each change in args
@@ -529,9 +535,9 @@ if os.getenv('NUMBA_DISABLE_JIT') != "1":
         # ('known_tags', numba.typeof(l_string)),
     ]
 else:
-    specs = []
+    specs_eqsys = []
 
-@numba.jitclass(specs)
+# @jitclass(specs_eqsys)
 class EquilibriumSystem():
     "Equilibrium System - Main class for calculations"
 
@@ -1174,7 +1180,19 @@ def default_activity_logic(activity_model_type, setup_log_gamma_func=None, calc_
 
 
 
+def jit_compile_functions():
+    global SolutionResult
+    SolutionResult = jitclass(spec_result)(SolutionResult)
 
+    # global IndexController
+    # IndexController = jitclass(specs_idx)(IndexController)
+
+    global EqReaction
+    EqReaction = jitclass(specs_reacs)(EqReaction)
+
+    global EquilibriumSystem
+    EquilibriumSystem = jitclass(specs_eqsys)(EquilibriumSystem)
+    return
 
 
 

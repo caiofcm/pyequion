@@ -17,16 +17,16 @@ def create_nb_List(py_list):
     #     return nb_List #numba does not deal with None
 
     # if len(py_list) == 0:
-    print(py_list)
+    # print(py_list)
     if not py_list:
         # print('db1', nb_List, py_list, type(nb_List), type(py_list))
-        print('he1')
+        # print('he1')
         whatNew = List()
-        print('he1.2')
+        # print('he1.2')
         whatNew.append('a')
-        print('he2')
+        # print('he2')
         whatNew.pop()
-        print('he3')
+        # print('he3')
         # del whatNew[0]
         # print('db2', whatNew, py_list, type(whatNew), type(py_list))
         return whatNew #numba does not deal with None

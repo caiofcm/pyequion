@@ -13,20 +13,24 @@ from . import PengRobinson #WILL FAIL WITH NUMBA
 
 # np = numpy
 
-# class TypeActivityCalculation(enum.Enum): #TODO: add enum and fix numba enum.Enum
-#     IDEAL = 0
-#     DEBYE = 1
-#     PITZER = 2
-TypeActivityCalculation = enum.Enum(
-    'TypeActivityCalculation', [
-        ('IDEAL', 0),  #Ideal logg = 0.0
-        ('DEBYE', 1),  #Debye-Huchel with Davies and 0.1I fallback
-        ('DEBYE_MEAN', 2), #As Debye but calculating neutral with mean activity coefficient
-        ('PITZER', 3),  #Pitzer: to be included.
-        ('BROMLEY', 4),
-        ('SIT', 5),
-    ]
-)
+class TypeActivityCalculation(enum.Enum): #TODO: add enum and fix numba enum.Enum
+    IDEAL = 'IDEAL'
+    DEBYE = 'DEBYE'
+    DEBYE_MEAN = 'DEBYE_MEAN'
+    PITZER = 'PITZER'
+    BROMLEY = 'BROMLEY'
+    SIT = 'SIT'
+
+# TypeActivityCalculation = enum.Enum(
+#     'TypeActivityCalculation', [
+#         ('IDEAL', 'ideal'),  #Ideal logg = 0.0
+#         ('DEBYE', 'debye'),  #Debye-Huchel with Davies and 0.1I fallback
+#         ('DEBYE_MEAN', 'debye_mean'), #As Debye but calculating neutral with mean activity coefficient
+#         ('PITZER', 'pitzer'),  #Pitzer: to be included.
+#         ('BROMLEY', 'bromley'),
+#         ('SIT', 'sit'),
+#     ]
+# )
 
 
 ################################
