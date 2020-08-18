@@ -7,10 +7,11 @@ from enum import Enum
 global np
 np = numpy
 import numba
-from numba.typed import Dict, List
+# from numba.typed import Dict, List
 import os
 from collections import namedtuple
-from .conductivity import solution_conductivity, conductivity_molar_zero
+from .conductivity import conductivity_molar_zero
+from . import conductivity
 import sympy
 from pyequion import symbolic_computations as mod_sym
 from . import utils_for_numba
@@ -38,6 +39,13 @@ warnings.filterwarnings("ignore", category=numba.NumbaPendingDeprecationWarning)
 from .data.species import species
 from .data.reactions_solutions import reactions_solutions
 from .data.reactions_solids import reactions_solids
+
+def set_list_type_for_jit():
+    print('in set_list_type_for_jit')
+    global List, Dict
+    List = numba.typed.List
+    Dict = numba.typed.Dict
+    return
 
 @numba.njit
 def populate_loggama_activities(species, loggamma):
@@ -74,7 +82,7 @@ if os.getenv('NUMBA_DISABLE_JIT') != "1":
     ]
 else:
     specs_idx = []
-@jitclass(specs_idx)
+# @jitclass(specs_idx)
 class IndexController():
     def __init__(self, species_tags=None, size=0):
         self.idx = {'size': size}
@@ -89,26 +97,27 @@ if os.getenv('NUMBA_DISABLE_JIT') == "1":
     IndexController.class_type = FakeNb()
 
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    specs = [
-    ('logc', numba.float64),
-    ('logg', numba.float64),
-    ('z', numba.int64),
-    ('phase', numba.int64), #Improve, but See Phase
-    ('name', numba.types.string),
-    # ('I_factor', numba.float64),
-    # ('dh_a', numba.float64),
-    # ('dh_b', numba.float64),
-    ('cond_molar', numba.float64),
-    ('p_int', numba.typeof(d_int)), #scalar parameters
-    ('p_scalar', numba.typeof(d_scalar)), #scalar parameters
-    ('p_iarray', numba.typeof(d_iarray)), #int array parameters
-    ('p_array', numba.typeof(d_array)),  #array parameters
-    ('p_matrix', numba.typeof(d_matrix)),  #matrix parameters
-    ('d', numba.typeof(d_nested)),  #nested dict float parameters
-]
+#     specs_specie = [
+#     ('logc', numba.float64),
+#     ('logg', numba.float64),
+#     ('z', numba.int64),
+#     ('phase', numba.int64), #Improve, but See Phase
+#     ('name', numba.types.string),
+#     # ('I_factor', numba.float64),
+#     # ('dh_a', numba.float64),
+#     # ('dh_b', numba.float64),
+#     ('cond_molar', numba.float64),
+#     ('p_int', numba.typeof(d_int)), #scalar parameters
+#     ('p_scalar', numba.typeof(d_scalar)), #scalar parameters
+#     ('p_iarray', numba.typeof(d_iarray)), #int array parameters
+#     ('p_array', numba.typeof(d_array)),  #array parameters
+#     ('p_matrix', numba.typeof(d_matrix)),  #matrix parameters
+#     ('d', numba.typeof(d_nested)),  #nested dict float parameters
+# ]
+    pass
 else:
-    specs = []
-@jitclass(specs)
+    specs_specie = []
+# @jitclass(specs_specie)
 class Specie():
     "A chemical compound (ion, neutral, gas, solid)"
 
@@ -173,31 +182,33 @@ def create_numba_list_of_dict():
 
 
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    l_species, l_string = create_typed_lists()
-    l_d_string_float = create_numba_list_of_dict()
-    type_list_specie = numba.typeof(l_species)
+    # l_species, l_string = create_typed_lists()
+    # l_d_string_float = create_numba_list_of_dict()
+    # type_list_specie = numba.typeof(l_species)
+    pass
 
 #--------------------------------------------
 #	REACTIONS DEFINITIONS
 #--------------------------------------------
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    specs_reacs = [
-    # ('idx_species__', numba.int64),
-    # ('stoic_coefs', numba.float64),
-    # ('constant_T_coefs', numba.float64),
+#     specs_reacs = [
+#     # ('idx_species__', numba.int64),
+#     # ('stoic_coefs', numba.float64),
+#     # ('constant_T_coefs', numba.float64),
 
-    ('idx_species', numba.int64[:]),
-    ('stoic_coefs', numba.float64[:]),
-    # ('stoic_coefs', numba.types.List(numba.int64)),
-    ('idx_reaction_db', numba.int64),
-    ('constant_T_coefs', numba.float64[:]),
-    ('log_K25', numba.float64),
-    ('type', numba.types.unicode_type),
+#     ('idx_species', numba.int64[:]),
+#     ('stoic_coefs', numba.float64[:]),
+#     # ('stoic_coefs', numba.types.List(numba.int64)),
+#     ('idx_reaction_db', numba.int64),
+#     ('constant_T_coefs', numba.float64[:]),
+#     ('log_K25', numba.float64),
+#     ('type', numba.types.unicode_type),
 
-    ('delta_h', numba.float64),
-    # ('species_tags', numba.types.List(numba.types.unicode_type)),
-    ('species_tags', numba.typeof(l_string)),
-]
+#     ('delta_h', numba.float64),
+#     # ('species_tags', numba.types.List(numba.types.unicode_type)),
+#     ('species_tags', numba.typeof(l_string)),
+# ]
+    pass
 else:
     specs_reacs = []
 
@@ -299,14 +310,14 @@ if os.getenv('NUMBA_DISABLE_JIT') == "1":
 #--------------------------------------------
 #	REACTIONS DEFINITIONS
 #--------------------------------------------
-@jitclass([
-    ('idx_species', numba.int64[:]),
-    ('stoic_coefs', numba.float64[:]),
-    ('idx_feed', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
-    ('use_constant_value', numba.boolean),
-    ('feed_is_unknown', numba.boolean),
-    # ('idx_feed', ),
-])
+# @jitclass([
+#     ('idx_species', numba.int64[:]),
+#     ('stoic_coefs', numba.float64[:]),
+#     ('idx_feed', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
+#     ('use_constant_value', numba.boolean),
+#     ('feed_is_unknown', numba.boolean),
+#     # ('idx_feed', ),
+# ])
 class MassBalance():
     "A mass balance representation"
 
@@ -376,58 +387,46 @@ DUMMY_EqREACTION = EqReaction(
         np.array([np.nan], dtype=np.float64),
         -1.0, np.array([np.nan], dtype=np.float64), 'dummy', create_nb_List(['']), np.nan
     ) #-1 IS DUMMY -> Numba issues
-# DUMMY_EqREACTION = EqReaction(
-#         1,
-#         # np.array([-1, -1], dtype=np.int64),
-#         # np.array([1]),
-#         # np.array([-1]),
-#         # 2.0,
-#         # -1.0,
-#         # 2.0,
-#         # 'dummy',
-#         # create_nb_List(['']),
-#         # 2.0
-#     ) #-1 IS DUMMY -> Numba issues
 
-if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    l_reactions = numba.typed.List()
-    l_reactions.append(DUMMY_EqREACTION)
+# if os.getenv('NUMBA_DISABLE_JIT') != "1":
+#     l_reactions = numba.typed.List()
+#     l_reactions.append(DUMMY_EqREACTION)
 # else:
     # l_reactions
 
 #--------------------------------------------
 #	SOLUTION RESULT
 #--------------------------------------------
-if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    spec_result = [
-        ('c_molal', numba.float64[:]),
-        ('gamma', numba.float64[:]),
-        ('pH', numba.float64),
-        ('I', numba.float64),
-        ('DIC', numba.float64), #Only the dissolved Carbon (solid not counted)
-        ('sc', numba.float64),
-        # ('SI', numba.typeof(SI_Dict)),
-        # ('SI', numba.float64[:]),
-        ('IAP', numba.float64[:]),
-        ('solid_names', numba.types.List(numba.types.unicode_type)),
-        ('precipitation_molalities', numba.float64[:]),
-        # ('specie_names', numba.types.List(numba.types.unicode_type)),
-        ('specie_names', numba.typeof(l_string)),
-        ('saturation_index', numba.typeof(d_scalar)),
-        ('preciptation_conc', numba.typeof(d_scalar)),
-        ('ionic_activity_prod', numba.typeof(d_scalar)),
-        ('log_K_solubility', numba.typeof(d_scalar)),
-        ('idx', numba.typeof(d_int)),
-        ('reactions', numba.typeof(l_d_string_float)),
-        ('index_solubility_calculation', numba.int64),
-        ('calculated_solubility', numba.typeof(d_scalar)),
-        ('concentrations', numba.typeof(d_scalar)),
-        ('x', numba.float64[:]), #Numerical solution
-        ('successfull', numba.boolean),
+# if os.getenv('NUMBA_DISABLE_JIT') != "1":
+#     spec_result = [
+#         ('c_molal', numba.float64[:]),
+#         ('gamma', numba.float64[:]),
+#         ('pH', numba.float64),
+#         ('I', numba.float64),
+#         ('DIC', numba.float64), #Only the dissolved Carbon (solid not counted)
+#         ('sc', numba.float64),
+#         # ('SI', numba.typeof(SI_Dict)),
+#         # ('SI', numba.float64[:]),
+#         ('IAP', numba.float64[:]),
+#         ('solid_names', numba.types.List(numba.types.unicode_type)),
+#         ('precipitation_molalities', numba.float64[:]),
+#         # ('specie_names', numba.types.List(numba.types.unicode_type)),
+#         ('specie_names', numba.typeof(l_string)),
+#         ('saturation_index', numba.typeof(d_scalar)),
+#         ('preciptation_conc', numba.typeof(d_scalar)),
+#         ('ionic_activity_prod', numba.typeof(d_scalar)),
+#         ('log_K_solubility', numba.typeof(d_scalar)),
+#         ('idx', numba.typeof(d_int)),
+#         ('reactions', numba.typeof(l_d_string_float)),
+#         ('index_solubility_calculation', numba.int64),
+#         ('calculated_solubility', numba.typeof(d_scalar)),
+#         ('concentrations', numba.typeof(d_scalar)),
+#         ('x', numba.float64[:]), #Numerical solution
+#         ('successfull', numba.boolean),
 
-    ]
-else:
-    spec_result = []
+#     ]
+# else:
+#     spec_result = []
 # @jitclass(spec_result)
 class SolutionResult():
     """Final equilibrium solution representation
@@ -490,50 +489,51 @@ if os.getenv('NUMBA_DISABLE_JIT') == "1":
     pass
 
 if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    specs_eqsys = [
-        ('c_feed', numba.float64),
-        # Extra variables for equilibrium specific cases: to be more generic is a list of np.ndarray (it has to be an array)
-        # Arguments in function is necessary for the jacobian, otherwise the jacobian would need to be generated for each change in args
-        # This field args is just for convenience to have it stored (OR NOT MAY BE REMOVED)
-        ('args', numba.types.List(numba.float64[:])),
-        ('res', numba.float64[:]),
-        ('TK', numba.float64),
-        # ('idx', Indexes.class_type.instance_type),
-        ('idx_control', IndexController.class_type.instance_type),
-        # ('species', numba.types.List(Specie.class_type.instance_type)),
-        ('species', type_list_specie),
-        # ('reactions', numba.types.List(EqReaction.class_type.instance_type)),
-        ('reactions', numba.typeof(l_reactions)),
-        ('ionic_strength', numba.float64),
-        ('pH', numba.float64),
-        ('sc', numba.float64),
-        ('molar_conc', numba.float64[:]),
-        ('gamma', numba.float64[:]),
-        # ('activity_model_type', numba.typeof(TypeActivityCalculation)),
-        # ('activity_model_type', numba.types.EnumMember(TypeActivityCalculation, numba.int64)),
-        ('mass_balances', numba.types.List(MassBalance.class_type.instance_type)),
-        ('mass_balances_known', numba.types.List(MassBalance.class_type.instance_type)),
-        ('is_there_known_mb', numba.boolean),
-        ('dic_idx_coef', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
-        # ('solid_reactions_but_not_equation', numba.types.List(EqReaction.class_type.instance_type)),
-        ('solid_reactions_but_not_equation', numba.typeof(l_reactions)),
-        ('num_of_feeds', numba.int64),
+    # specs_eqsys = [
+    #     ('c_feed', numba.float64),
+    #     # Extra variables for equilibrium specific cases: to be more generic is a list of np.ndarray (it has to be an array)
+    #     # Arguments in function is necessary for the jacobian, otherwise the jacobian would need to be generated for each change in args
+    #     # This field args is just for convenience to have it stored (OR NOT MAY BE REMOVED)
+    #     ('args', numba.types.List(numba.float64[:])),
+    #     ('res', numba.float64[:]),
+    #     ('TK', numba.float64),
+    #     # ('idx', Indexes.class_type.instance_type),
+    #     ('idx_control', IndexController.class_type.instance_type),
+    #     # ('species', numba.types.List(Specie.class_type.instance_type)),
+    #     ('species', type_list_specie),
+    #     # ('reactions', numba.types.List(EqReaction.class_type.instance_type)),
+    #     ('reactions', numba.typeof(l_reactions)),
+    #     ('ionic_strength', numba.float64),
+    #     ('pH', numba.float64),
+    #     ('sc', numba.float64),
+    #     ('molar_conc', numba.float64[:]),
+    #     ('gamma', numba.float64[:]),
+    #     # ('activity_model_type', numba.typeof(TypeActivityCalculation)),
+    #     # ('activity_model_type', numba.types.EnumMember(TypeActivityCalculation, numba.int64)),
+    #     ('mass_balances', numba.types.List(MassBalance.class_type.instance_type)),
+    #     ('mass_balances_known', numba.types.List(MassBalance.class_type.instance_type)),
+    #     ('is_there_known_mb', numba.boolean),
+    #     ('dic_idx_coef', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
+    #     # ('solid_reactions_but_not_equation', numba.types.List(EqReaction.class_type.instance_type)),
+    #     ('solid_reactions_but_not_equation', numba.typeof(l_reactions)),
+    #     ('num_of_feeds', numba.int64),
 
-        # System creation related
-        ('feed_compounds', numba.typeof(l_string)),
-        ('closing_equation_type', numba.int64),
-        ('element_mass_balance', numba.typeof(l_string)),
-        ('initial_feed_mass_balance', numba.typeof(l_string)),
-        ('fixed_elements', numba.typeof(l_string)),
-        # ('database_files', numba.typeof(d_string)),
-        ('reactionsStorage', numba.typeof(l_d_string_float)),
-        ('index_solubility_calculation', numba.int64),
-        ('fugacity_calculation', numba.types.unicode_type), #TEST: will fail in numba
+    #     # System creation related
+    #     ('feed_compounds', numba.typeof(l_string)),
+    #     ('closing_equation_type', numba.int64),
+    #     ('element_mass_balance', numba.typeof(l_string)),
+    #     ('initial_feed_mass_balance', numba.typeof(l_string)),
+    #     ('fixed_elements', numba.typeof(l_string)),
+    #     # ('database_files', numba.typeof(d_string)),
+    #     ('reactionsStorage', numba.typeof(l_d_string_float)),
+    #     ('index_solubility_calculation', numba.int64),
+    #     ('fugacity_calculation', numba.types.unicode_type), #TEST: will fail in numba
 
-        ('allow_precipitation', numba.boolean),
-        ('solid_reactions_in', numba.typeof(l_d_string_float)),
-        # ('known_tags', numba.typeof(l_string)),
-    ]
+    #     ('allow_precipitation', numba.boolean),
+    #     ('solid_reactions_in', numba.typeof(l_d_string_float)),
+    #     # ('known_tags', numba.typeof(l_string)),
+    # ]
+    pass
 else:
     specs_eqsys = []
 
@@ -819,7 +819,7 @@ class EquilibriumSystem():
             cond_zero[i] = sp.cond_molar
         # cond_zero = np.array([conductivity_molar_zero[sp.idx_db] #FIXME conductivity parameters for species into db!!! PROGRAM BREAK!!
         #                       for sp in self.species])
-        return solution_conductivity(I, gm, c, charges, cond_zero)
+        return conductivity.solution_conductivity(I, gm, c, charges, cond_zero)
         # return -1
 
     def calc_DIC(self):
@@ -1181,17 +1181,178 @@ def default_activity_logic(activity_model_type, setup_log_gamma_func=None, calc_
 
 
 def jit_compile_functions():
+    # utils_for_numba.USE_JIT = True
+    utils_for_numba.set_list_type_for_jit()
+    set_list_type_for_jit()
+
+    specs_specie = [
+        ('logc', numba.float64),
+        ('logg', numba.float64),
+        ('z', numba.int64),
+        ('phase', numba.int64), #Improve, but See Phase
+        ('name', numba.types.string),
+        # ('I_factor', numba.float64),
+        # ('dh_a', numba.float64),
+        # ('dh_b', numba.float64),
+        ('cond_molar', numba.float64),
+        ('p_int', numba.typeof(d_int)), #scalar parameters
+        ('p_scalar', numba.typeof(d_scalar)), #scalar parameters
+        ('p_iarray', numba.typeof(d_iarray)), #int array parameters
+        ('p_array', numba.typeof(d_array)),  #array parameters
+        ('p_matrix', numba.typeof(d_matrix)),  #matrix parameters
+        ('d', numba.typeof(d_nested)),  #nested dict float parameters
+    ]
+
+    global Specie
+    Specie = jitclass(specs_specie)(Specie)
+
+    l_species, l_string = create_typed_lists()
+    l_d_string_float = create_numba_list_of_dict()
+    type_list_specie = numba.typeof(l_species)
+
+    spec_result = [
+        ('c_molal', numba.float64[:]),
+        ('gamma', numba.float64[:]),
+        ('pH', numba.float64),
+        ('I', numba.float64),
+        ('DIC', numba.float64), #Only the dissolved Carbon (solid not counted)
+        ('sc', numba.float64),
+        # ('SI', numba.typeof(SI_Dict)),
+        # ('SI', numba.float64[:]),
+        ('IAP', numba.float64[:]),
+        ('solid_names', numba.types.List(numba.types.unicode_type)),
+        ('precipitation_molalities', numba.float64[:]),
+        # ('specie_names', numba.types.List(numba.types.unicode_type)),
+        ('specie_names', numba.typeof(l_string)),
+        ('saturation_index', numba.typeof(d_scalar)),
+        ('preciptation_conc', numba.typeof(d_scalar)),
+        ('ionic_activity_prod', numba.typeof(d_scalar)),
+        ('log_K_solubility', numba.typeof(d_scalar)),
+        ('idx', numba.typeof(d_int)),
+        ('reactions', numba.typeof(l_d_string_float)),
+        ('index_solubility_calculation', numba.int64),
+        ('calculated_solubility', numba.typeof(d_scalar)),
+        ('concentrations', numba.typeof(d_scalar)),
+        ('x', numba.float64[:]), #Numerical solution
+        ('successfull', numba.boolean),
+    ]
+
     global SolutionResult
     SolutionResult = jitclass(spec_result)(SolutionResult)
 
-    # global IndexController
-    # IndexController = jitclass(specs_idx)(IndexController)
+    specs_idx = [
+        ('idx', numba.typeof(d_int)),
+        ('s', numba.typeof(d_scalar)),
+        ('a', numba.typeof(d_array)),
+        ('m', numba.typeof(d_matrix)),
+    ]
+
+    global IndexController
+    IndexController = jitclass(specs_idx)(IndexController)
+
+
+    specs_reacs = [
+        # ('idx_species__', numba.int64),
+        # ('stoic_coefs', numba.float64),
+        # ('constant_T_coefs', numba.float64),
+
+        ('idx_species', numba.int64[:]),
+        ('stoic_coefs', numba.float64[:]),
+        # ('stoic_coefs', numba.types.List(numba.int64)),
+        ('idx_reaction_db', numba.int64),
+        ('constant_T_coefs', numba.float64[:]),
+        ('log_K25', numba.float64),
+        ('type', numba.types.unicode_type),
+
+        ('delta_h', numba.float64),
+        # ('species_tags', numba.types.List(numba.types.unicode_type)),
+        ('species_tags', numba.typeof(l_string)),
+    ]
 
     global EqReaction
     EqReaction = jitclass(specs_reacs)(EqReaction)
 
+    global DUMMY_EqREACTION
+    DUMMY_EqREACTION = EqReaction(
+            np.array([-1, -1], dtype=np.int64),
+            # np.array([-1]),
+            np.array([np.nan], dtype=np.float64),
+            -1.0, np.array([np.nan], dtype=np.float64), 'dummy', create_nb_List(['']), np.nan
+        ) #-1 IS DUMMY -> Numba issues
+
+    # if os.getenv('NUMBA_DISABLE_JIT') != "1":
+    l_reactions = numba.typed.List()
+    l_reactions.append(DUMMY_EqREACTION)
+
+    spec_mass_balance = [
+        ('idx_species', numba.int64[:]),
+        ('stoic_coefs', numba.float64[:]),
+        ('idx_feed', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
+        ('use_constant_value', numba.boolean),
+        ('feed_is_unknown', numba.boolean),
+    ]
+
+    global MassBalance
+    MassBalance = jitclass(spec_mass_balance)(MassBalance)
+
+    global DUMMY_MB
+    DUMMY_MB = MassBalance(np.array([-1]), np.array([-1.0]), [(-1, -1.0)], False)
+
+    specs_eqsys = [
+        ('c_feed', numba.float64),
+        # Extra variables for equilibrium specific cases: to be more generic is a list of np.ndarray (it has to be an array)
+        # Arguments in function is necessary for the jacobian, otherwise the jacobian would need to be generated for each change in args
+        # This field args is just for convenience to have it stored (OR NOT MAY BE REMOVED)
+        ('args', numba.types.List(numba.float64[:])),
+        ('res', numba.float64[:]),
+        ('TK', numba.float64),
+        # ('idx', Indexes.class_type.instance_type),
+        ('idx_control', IndexController.class_type.instance_type),
+        # ('species', numba.types.List(Specie.class_type.instance_type)),
+        ('species', type_list_specie),
+        # ('reactions', numba.types.List(EqReaction.class_type.instance_type)),
+        ('reactions', numba.typeof(l_reactions)),
+        ('ionic_strength', numba.float64),
+        ('pH', numba.float64),
+        ('sc', numba.float64),
+        ('molar_conc', numba.float64[:]),
+        ('gamma', numba.float64[:]),
+        # ('activity_model_type', numba.typeof(TypeActivityCalculation)),
+        # ('activity_model_type', numba.types.EnumMember(TypeActivityCalculation, numba.int64)),
+        ('mass_balances', numba.types.List(MassBalance.class_type.instance_type)),
+        ('mass_balances_known', numba.types.List(MassBalance.class_type.instance_type)),
+        ('is_there_known_mb', numba.boolean),
+        ('dic_idx_coef', numba.types.List(numba.types.Tuple( (numba.int64, numba.float64))) ),
+        # ('solid_reactions_but_not_equation', numba.types.List(EqReaction.class_type.instance_type)),
+        ('solid_reactions_but_not_equation', numba.typeof(l_reactions)),
+        ('num_of_feeds', numba.int64),
+
+        # System creation related
+        ('feed_compounds', numba.typeof(l_string)),
+        ('closing_equation_type', numba.int64),
+        ('element_mass_balance', numba.typeof(l_string)),
+        ('initial_feed_mass_balance', numba.typeof(l_string)),
+        ('fixed_elements', numba.typeof(l_string)),
+        # ('database_files', numba.typeof(d_string)),
+        ('reactionsStorage', numba.typeof(l_d_string_float)),
+        ('index_solubility_calculation', numba.int64),
+        ('fugacity_calculation', numba.types.unicode_type), #TEST: will fail in numba
+
+        ('allow_precipitation', numba.boolean),
+        ('solid_reactions_in', numba.typeof(l_d_string_float)),
+        # ('known_tags', numba.typeof(l_string)),
+    ]
+
     global EquilibriumSystem
     EquilibriumSystem = jitclass(specs_eqsys)(EquilibriumSystem)
+
+
+    # Activity coefficients model compilation
+    act.calc_log_gamma_ideal = numba.njit()(act.calc_log_gamma_ideal)
+    act.calc_log_gamma_dh_bdot = numba.njit()(act.calc_log_gamma_dh_bdot)
+    conductivity.solution_conductivity = numba.njit()(conductivity.solution_conductivity)
+
+
     return
 
 

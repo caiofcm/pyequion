@@ -1,5 +1,5 @@
 import os
-os.environ['NUMBA_DISABLE_JIT'] = '1' #SHOULD WORK WITH 0 ALSO
+# os.environ['NUMBA_DISABLE_JIT'] = '1' #SHOULD WORK WITH 0 ALSO
 import time
 import sys
 import inspect
@@ -33,6 +33,8 @@ Automatic precipitation halted = Its not the same calculation...
 
 """
 
+# THIS LINE WILL COMPILE FUNCTION with numba
+pyequion.core.jit_compile_functions()
 
 def test_phreeqpython_nahco3_open():
     comp_dict = {'NaHCO3':1.0}

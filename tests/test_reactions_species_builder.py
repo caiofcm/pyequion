@@ -1,5 +1,5 @@
 import os
-os.environ['NUMBA_DISABLE_JIT'] = '1' #SHOULD WORK WITH 0 ALSO
+# os.environ['NUMBA_DISABLE_JIT'] = '1' #SHOULD WORK WITH 0 ALSO
 import pytest
 from pyequion import create_equilibrium, solve_equilibrium
 import pyequion

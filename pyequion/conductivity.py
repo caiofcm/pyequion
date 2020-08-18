@@ -111,7 +111,7 @@ conductivity_molar_zero[24] = 0.0  #  BaCO3s' - dummy
 #     ret *= 1e-3
 #     return ret
 
-@numba.njit
+# @numba.njit
 def solution_conductivity(I, gamma, conc_vals, charges, cond_molar_zero):
     """
     Solution non-ideal conductivity calculation

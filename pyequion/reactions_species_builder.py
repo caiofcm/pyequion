@@ -24,6 +24,7 @@ from .utils import ClosingEquationType
 #	REACTIONS LIST DEFINITIONS DATABASE
 #--------------------------------------------
 
+
 #FIXME: Irreversible Equations
 # Necessary for the correct element identification
 # Also Including CO2 = CO2(g) Henry constant, but should be treat later as a gas FIXME
@@ -171,7 +172,7 @@ def create_equilibrium_from_reaction_and_species(reactions, species,
     if len(solid_reactions) > 0:
         solid_reactions_ = create_list_of_reactions_engine(solid_reactions, engine_idxs.idx)
     else:
-        solid_reactions_ = List()
+        solid_reactions_ = core.List()
         solid_reactions_.append(core.DUMMY_EqREACTION)
         # solid_reactions_ = [core.DUMMY_EqREACTION]
         # print('i am just a dummy reaction')
@@ -200,7 +201,7 @@ def create_equilibrium_from_reaction_and_species(reactions, species,
     if solid_reactions_in is None or solid_reactions_in == []:
         d_aux_del = {'dummy': -1.0}
         aux = create_nb_Dict(d_aux_del)
-        solid_reactions_in_ = List()
+        solid_reactions_in_ = core.List()
         solid_reactions_in_.append(aux)
         del solid_reactions_in_[0]
     else:
@@ -229,7 +230,7 @@ def create_equilibrium_from_reaction_and_species(reactions, species,
         return sys_eq
 
 def numbafy_list_dict_str_float_reaction_storage(list_in):
-    r = List()
+    r = core.List()
     for item in list_in:
         d_mod = {k:float(v) for k,v in item.items() if k[0].isupper()} #WIERD CHECK FOR UPPERCASE
         aux = create_nb_Dict(d_mod)
@@ -237,7 +238,7 @@ def numbafy_list_dict_str_float_reaction_storage(list_in):
     return r
 
 def numbafy_list_dict_str_float_regular(list_in):
-    r = List()
+    r = core.List()
     for item in list_in:
         d_mod = {k:float(v) for k,v in item.items() if k[0].isupper()} #WIERD CHECK FOR UPPERCASE
         aux = create_nb_Dict(d_mod)
@@ -562,7 +563,7 @@ def get_phase_from__species_tag(tag):
     return phase
 
 def create_list_of_species_engine(species_tag): #, species_activity_db):
-    species = List()
+    species = core.List()
     for tag in species_tag:
         sp = create_single_specie(tag)
         species.append(sp)
@@ -582,7 +583,7 @@ def create_Indexes_instance(species_tag, known_specie_size=0):
     return idx_ctrl
 
 def create_list_of_reactions_engine(reactions_list, dict_of_indexes_species):
-    reactions = List()
+    reactions = core.List()
     for reac in reactions_list:
         if reac['type'] not in  ['rev']:  continue #, 'henry']:
         reac_species = get_reactions_species(reac)

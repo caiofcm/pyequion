@@ -2,11 +2,30 @@ import os
 import numpy as np
 import numba
 
-if os.getenv('NUMBA_DISABLE_JIT') != "1":
-    from numba.typed import List, Dict
-else:
-    List = list
-    Dict = dict #parei aqui
+# USE_JIT = False
+
+# if os.getenv('NUMBA_DISABLE_JIT') != "1":
+#     from numba.typed import List, Dict
+# else:
+#     List = list
+#     Dict = dict #parei aqui
+
+
+# if USE_JIT:
+#     from numba.typed import List, Dict
+# else:
+#     List = list
+#     Dict = dict #parei aqui
+# from numba.typed import List as numbaList, Dict
+import numba.typed
+List = list
+Dict = dict
+
+def set_list_type_for_jit():
+    global List, Dict
+    List = numba.typed.List
+    Dict = numba.typed.Dict
+    return
 
 def create_nb_List(py_list):
     nb_List = List()

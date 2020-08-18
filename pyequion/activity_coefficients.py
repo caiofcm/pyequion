@@ -45,7 +45,7 @@ def setup_log_gamma_ideal(reaction_sys, T, db_species, c_feed=None):
     "Setup activity calculation for ideal model"
     return
 
-@numba.njit
+# @numba.njit
 def calc_log_gamma_ideal(idx_ctrl, species, I, T):
     "Activity Coefifcient calculation for ideal model"
     [sp.set_log_gamma(0.0) for sp in species]
@@ -88,7 +88,7 @@ def setup_log_gamma_bdot(reaction_sys, T, db_species, c_feed=None):
         sp.p_scalar['dh_b'] = dh_b
     return
 
-@numba.njit
+# @numba.njit
 def calc_log_gamma_dh_bdot(idx_ctrl, species, I: float, T: float): #FIXME: idx_ctrl to reaction_sys ?
     """ Calculation as in PHREEQC
 
