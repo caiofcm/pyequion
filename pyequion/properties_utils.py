@@ -8,12 +8,12 @@ import numba
 pCO2_ref = 0.0003908408957924021
 
 # def use_sympy_as_np()
-@numba.njit
+# @numba.njit
 def dieletricconstant_water(TK):
     # for TK: 273-372
     return (0.24921e3 - 0.79069*TK + 0.72997e-3*TK**2)
 
-@numba.njit
+# @numba.njit
 def density_water(TK):
     # for TK: 273-372
     return (0.183652 + 0.00724987*TK - 0.203449e-4*TK**2 + 1.73702e-8*TK**3)

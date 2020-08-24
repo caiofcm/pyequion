@@ -943,13 +943,14 @@ def get_list_of_reactions_latex(initial_comp, allow_precipitation=False,
     return reacs_formatted
 
 def display_reactions(sys_eq):
+    latex_reactions = format_reaction_list_as_latex_mhchem(sys_eq.reactionsStorage)
     try:
         from IPython.display import display, Math, Latex
-    except ImportError as error:
-        print('Error to display the reactions in latex format: module Ipython not found')
-        raise error
-    latex_reactions = format_reaction_list_as_latex_mhchem(sys_eq.reactionsStorage)
-    [display(Math(r)) for r in latex_reactions];
+        [display(Math(r)) for r in latex_reactions];
+    except (ImportError, ModuleNotFoundError) as error:
+        # print('Error to display the reactions in latex format: module Ipython not found')
+        # raise error
+        [print(eq) for eq in latex_reactions]
     return
 
 def ipython_display_reactions(sol: SolutionResult):

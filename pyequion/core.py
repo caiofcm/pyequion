@@ -1117,7 +1117,11 @@ def save_jacobian_of_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=N
     pass
 
 def save_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
-    setup_log_gamma=None, calc_log_gamma=None, activities_db_file_name=None, activity_model_type=act.TypeActivityCalculation.DEBYE):
+    setup_log_gamma=None, calc_log_gamma=None,
+    activities_db_file_name=None,
+    activity_model_type=act.TypeActivityCalculation.DEBYE,
+    use_numpy=True, include_imports=True,
+    numbafy=True):
     """Save residual function to file
 
     Parameters
@@ -1136,10 +1140,11 @@ def save_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
     # J = mod_sym.obtain_symbolic_jacobian(res, x)
     s = mod_sym.string_lambdastr_as_function(
         res, x, args, fun_name,
-        use_numpy=True, include_imports=True
+        use_numpy=use_numpy, include_imports=include_imports
     )
-    s = mod_sym.numbafy_function_string(s,
-        numba_kwargs_string='cache=True', func_additional_arg='dummy=None') #added calc
+    if numbafy:
+        s = mod_sym.numbafy_function_string(s,
+            numba_kwargs_string='cache=True', func_additional_arg='dummy=None') #added calc
     mod_sym.save_function_string_to_file(s, loc_path)
     mod_sym.return_to_sympy_to_numpy()
     pass
@@ -1359,6 +1364,8 @@ def jit_compile_functions():
     act.calc_sit_method = numba.njit()(act.calc_sit_method)
     act.calc_log_gamma_pitzer = numba.njit()(act.calc_log_gamma_pitzer)
     act.calc_log_gamma_dh_bdot_mean_activity_neutral = numba.njit()(act.calc_log_gamma_dh_bdot_mean_activity_neutral)
+    act.dieletricconstant_water = numba.njit()(act.dieletricconstant_water)
+    act.density_water = numba.njit()(act.density_water)
 
     print('End JIT compilation settings')
     return
