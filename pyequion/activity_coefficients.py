@@ -175,7 +175,7 @@ def calc_log_gamma_dh_bdot_with_pengrobinson(idx_ctrl, species, I: float, T: flo
         sp.set_log_gamma(logg)
     pass
 
-@numba.njit
+# @numba.njit
 def b_dot_equation(I, A, B, a, b, z):
     logg = -A*z**2*np.sqrt(I)/(1+B*a*np.sqrt(I))+b*I
     return logg
@@ -239,7 +239,7 @@ def setup_log_gamma_bdot_mean_activity_neutral(reaction_sys,
                 sp.p_int['use_mean_act'] = True
     return
 
-@numba.njit
+# @numba.njit
 def calc_log_gamma_dh_bdot_mean_activity_neutral(idx_ctrl, species, I, T): #FIXME: idx_ctrl to reaction_sys ?
     r""" Calculation as in PHREEQC but with mean coefficient for neutral dissociating
 
@@ -438,7 +438,7 @@ def setup_log_gamma_pitzer(reaction_sys,
 
     return
 
-@numba.njit
+# @numba.njit
 def calc_log_gamma_pitzer(idx_ctrl, species, I, T): #FIXME: idx_ctrl to reaction_sys ?
     """ Activity Coef. Calculation with Pitzer
 
@@ -640,7 +640,7 @@ def setup_bromley_method_Bindividual(reaction_sys, T, db_species, c_feed=None):
             c.p_scalar[a.name] = Bca
     return
 
-@numba.njit
+# @numba.njit
 def bromley_model_ion(I, Bi_j, zi, zj, mj):
     TK=25.0+273.15
     A, _ = debye_huckel_constant(TK)
@@ -665,7 +665,7 @@ def bromley_model_ion(I, Bi_j, zi, zj, mj):
 
     return loggi
 
-@numba.njit
+# @numba.njit
 def calc_bromley_method(idx_ctrl, species, I, T):
     anions = [sp for sp in species if sp.z < 0]
     cations = [sp for sp in species if sp.z > 0]
@@ -750,7 +750,7 @@ def setup_SIT_model(reaction_sys, T, db_species, c_feed=None):
 
 #     return loggi
 
-@numba.njit
+# @numba.njit
 def calc_sit_method(idx_ctrl, species, I, T):
     A, _ = debye_huckel_constant(T)
     Ba = 1.5
@@ -891,7 +891,7 @@ def setup_eNRTL_model(reaction_sys, T, db_species, c_feed=None):
     return
 
 
-@numba.njit
+# @numba.njit
 def calc_eNRTL_method(idx_ctrl, species, I, T):
     A, _ = debye_huckel_constant(T)
     Ba = 1.5
@@ -982,7 +982,7 @@ def species_definition_dh_model(tag, species_activity_db):
 #         return [-1.0]
 
 
-@numba.njit
+# @numba.njit
 def debye_huckel_constant(TK):
     epsilon = properties_utils.dieletricconstant_water(TK)
     rho = properties_utils.density_water(TK)
@@ -990,7 +990,7 @@ def debye_huckel_constant(TK):
     B = 50.2916*np.sqrt(rho/(epsilon*TK)) # Angstrom^-1 . (L/mol)^1/2
     return A, B
 
-@numba.njit
+# @numba.njit
 def log10gamma_davies(I, z, A):
     sqI = np.sqrt(I)
     logGamma = -A*z**2*(sqI/(1.0+sqI) - 0.3*I)

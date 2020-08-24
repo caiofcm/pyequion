@@ -9,7 +9,7 @@ from . import reactions_species_builder as rbuilder
 from .reactions_species_builder import display_reactions, ipython_display_reactions
 from . import utils
 from . import utils_api
-from .core import DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult
+from .core import DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult, jit_compile_functions
 from .properties_utils import pCO2_ref, solve_with_exception
 from .utils import ClosingEquationType, get_dissociating_ions
 from . import activity_coefficients
@@ -32,11 +32,89 @@ def solve_solution(comp_dict, reaction_system=None, TC=25.0,
     setup_log_gamma_func=None,
     calc_log_gamma=None,
     calculate_solubility=None,
-    vapour_equilibrium_phase=None, #Aborted - Understand this equilibrium better
+    vapour_equilibrium_phase=None,
     co2_partial_pressure=core.pCO2_ref,
     fugacity_calculation='ideal', #'ideal'or 'pr', maybe a UDF
     jac=None
     ):
+    """The main function for equilibrium calculation in PyEquIon
+
+    Parameters
+    ----------
+    comp_dict : dict
+        Key-value pairs of component TAG and molality in mM (e.g {'NaCl': 100} for 100mM of NaCl)
+    reaction_system : EquilibriumSystem, optional
+        Utilizes a previous created EquilibriumSystem,
+
+        by default None
+    TC : float, optional
+        Temperature in Celsius, by default 25.0
+    close_type : pyequion.ClosingEquationType, optional
+        The type of closing equation for the calculation.
+        The tested values are:
+            - NONE, that will use the input arguments for mass balance
+            - OPEN: will make the equilibrium with CO2(g), hence the value of co2_partial_pressure can be adjusted
+            - CARBON_TOTAL: allow setting a value for the total carbon concentration;
+            Note that it can be equivalent to NONE if the CARBON_TOTAL is equal to the CARBON obtained from the feed components
+            - PH: <TODO>
+
+        by default None
+    carbon_total : float, optional
+        The value for total carbon concentration (mM) in the system if option close_type == CARBON_TOTAL, by default 0.0
+    initial_feed_mass_balance : List[Str], optional
+        A list of species to be set directly from the feed inputs,
+        hence it is removed from the unknown species as it is calculated beforehand,
+
+        by default None
+    x_guess : np.ndarray, optional
+        The guess array for the nonlinear system, for instance can be used from a `SolutionResult.x`, by default None
+    element_mass_balance : List[Str], optional
+        A list of elements to be used in the mass balance calculation (the program can infer it from the feeds, maybe disconsidered),
+
+        by default None
+    allow_precipitation : bool, optional
+        Option to force equilibrium with solid phase.
+
+        Note: there may be more than a single phase to precipitate.
+
+        Hence pyequion will firstly solve the system and will precipitate the phase with higher SI
+
+        It will do this iterativally until there is no phase with SI > 0
+
+        It is recommended to use this option with `solid_equilibrium_phases` set,
+        by default False
+    solid_equilibrium_phases : List[str], optional
+        The solid phases that will be precipitated,
+        hence the solid equilibrium reaction is added to the list of reactions in the system,
+        by default None
+    activity_model_type : pyequion.TypeActivityCalculation Union str, optional
+        The thermodynamic model to use in the species activity coefficient calculation.
+        The options are from the Enum: pyequion.TypeActivityCalculation but a string can be used that will be convered to the Enum
+        by default TypeActivityCalculation.DEBYE
+    setup_log_gamma_func : callable, optional
+        A python function that will set parameters for the species for the user provided calc_log_gamma,
+        by default None
+    calc_log_gamma : callable, optional
+        A python function that will perform the calculations of all species activity coefficients,
+        by default None
+    calculate_solubility : [type], optional
+        <HALTED>, by default None
+    vapour_equilibrium_phase : [type], optional
+        <HALTED>, by default None
+    fugacity_calculation : str, optional
+        The model used for the fugacity calculation, options are:
+            - 'ideal': ideal gas model - fugacity coefficient ($\\phi = 1$)
+            - 'pr': Peng-Robinson model (currently only for CO2)
+        , by default 'ideal'
+    jac: callable, optional
+        A python function for calculating the jacobian of the system,
+        by default None
+
+    Returns
+    -------
+    SolutionResult
+        The solution result.
+    """
     if reaction_system is None:
         feed_compounds = [k for k in comp_dict.keys()]
         comps_vals = [v*1e-3 for v in comp_dict.values()]
@@ -56,7 +134,7 @@ def solve_solution(comp_dict, reaction_system=None, TC=25.0,
         close_type = close_type if  close_type is not None else ClosingEquationType.NONE
 
     if isinstance(activity_model_type, str):
-        activity_model_type = TypeActivityCalculation(activity_model_type)
+        activity_model_type = TypeActivityCalculation(activity_model_type.upper())
 
     ## Neutrality Checking:
     if not np.any(np.isnan(comps_vals)):
@@ -242,56 +320,8 @@ def solve_equilibrium(reaction_system, x_guess=None, args=None,
     vapour_equilibrium_phase=None, #use types, None or ('phase-name', 'feed-comp-to-release')
     fugacity_calculation='ideal',
     ):
-    """Lower function than solve_solution
-
-    Parameters
-    ----------
-    reaction_system : [type]
-        [description]
-    x_guess : [type], optional
-        [description], by default None
-    args : [type], optional
-        [description], by default None
-    jac : [type], optional
-        [description], by default None
-    ret_fsol : bool, optional
-        [description], by default False
-    setup_log_gamma_func : [type], optional
-        [description], by default None
-    calc_log_gamma : [type], optional
-        [description], by default None
-    activity_model_type : [type], optional
-        [description], by default TypeActivityCalculation.DEBYE
-    activities_db_file_name : [type], optional
-        [description], by default None
-    allow_precipitation : bool, optional
-        [description], by default False
-    solid_equilibrium_phases : [type], optional
-        [description], by default None
-    calculate_solubility : [type], optional
-        [description], by default None
-    vapour_equilibrium_phase : [type], optional
-        [description], by default None
-
-    Returns
-    -------
-    [type]
-        [description]
-
-    Raises
-    ------
-    ValueError
-        [description]
-    ValueError
-        [description]
-    ValueError
-        [description]
-    ValueError
-        [description]
-    ValueError
-        [description]
-    ValueError
-        [description]
+    """
+        Lower level function than solve_solution, please refer to `solve_solution` for argument descriptions
     """
     if allow_precipitation and jac is not None:
         raise ValueError('Unsupported feature: jacobian with allow precipitation.')
@@ -421,39 +451,6 @@ def solve_equilibrium(reaction_system, x_guess=None, args=None,
         return solution_precip, fsol, sys_eq_precip
     return solution_precip
 
-def adjust_sys_for_pengrobinson(fugacity_calculation, reaction_system, args):
-    if fugacity_calculation == 'pr': #ugly, to inject the P at p_scalar (is the same P used in args extra)
-        if reaction_system.closing_equation_type != ClosingEquationType.OPEN:
-            raise ValueError('PENGRobinson only for OPEN case at this point')
-        vapours = [sp for sp in reaction_system.species if '(g)' in sp.name]
-        for gas in vapours:
-            gas.p_scalar['P'] = args[2]
-        pass
-    return
-
-    # if ret_fsol:
-    #     return solution, fsol
-    # return solution
-
-def modify_system_for_precipitation(solution, reaction_system):
-    solids_will_precip = [solid for solid, si in solution.saturation_index.items()
-        if si > 0.0
-    ]
-    reac_solid_precip = [[reac for reac in reaction_system.solid_reactions_but_not_equation
-        if reac.type == solid_name][0]
-        for solid_name in solids_will_precip
-    ]
-    ## Check for polymorphs - only the most stable will precipitate
-    d_solids = rbuilder.check_polymorphs_in_reaction(reac_solid_precip, solution.saturation_index)
-
-    ## Convert Reaction Engine to db_reaction:
-    reac_solid_precip_no_polymorph = [reac_solid_precip[i] for _, i in d_solids.values()]
-    reacs_conv_solid_precip = rbuilder.conv_reaction_engine_to_db_like(reac_solid_precip_no_polymorph)
-
-    # Use only the aqueous and solid reaction from previous system (does not use database for liquid)
-    sys_eq_precip = transform_system_to_new_solids_reactions(reaction_system, reacs_conv_solid_precip)
-    return sys_eq_precip
-
 def print_solution(solution, conc_and_activity=False):
     "Print information of equilibrium solution results."
 
@@ -489,7 +486,7 @@ def print_solution(solution, conc_and_activity=False):
 
 def equilibrate_phase(sys_eq, phase_name,
     feed_idx_adjusted, args, limit=None, kw_solv_eq={}):
-    "Halted"
+    # "<DEPRECATED> This was halted."
 
     def eq_res(x):
         c_feed = args[0]
@@ -514,6 +511,23 @@ def equilibrate_phase(sys_eq, phase_name,
     return fsol.root
 
 def get_total_element(solution, element, get_which_tags=False):
+    """Get total concentration of a element
+
+    Parameters
+    ----------
+    solution : SolutionResult
+        The solution result in investigation
+    element : str
+        The string of the element, e.g 'Ca'
+    get_which_tags : bool, optional
+        If true, also return the species tags in which the element appear
+        , by default False
+
+    Returns
+    -------
+    float Union (float, List[str])
+        [description]
+    """
     a, d_sp = rbuilder.get_species_indexes_matching_element(
         solution.specie_names, element, solution.idx)
     m_tot = solution.c_molal[d_sp].sum()
@@ -522,7 +536,22 @@ def get_total_element(solution, element, get_which_tags=False):
         return m_tot, a
     return m_tot
 
-def get_mean_activity_coeff(solution: SolutionResult, tagCompound: str):
+def get_mean_activity_coeff(solution: SolutionResult, tagCompound: str) -> float:
+    """Calculates the mean activity coefficient for a compound
+
+    Parameters
+    ----------
+    solution : SolutionResult
+        The solution result
+    tagCompound : str
+        The tag of the salt of interest to compute the mean activity coefficient,
+        e.g 'MgCl2'
+
+    Returns
+    -------
+    float
+        The mean activity coefficient of a compound
+    """
 
     tags_coefs = utils.get_dissociating_ions_plain_reactions(tagCompound, solution.reactions)
 
@@ -543,7 +572,20 @@ def get_mean_activity_coeff(solution: SolutionResult, tagCompound: str):
 
     return g_mean
 
-def get_activity(solution: SolutionResult, tagCompound: str):
+def get_activity(solution: SolutionResult, tagCompound: str) -> float:
+    """Calculates the activity of a compound
+
+    Parameters
+    ----------
+    solution : SolutionResult
+    tagCompound : str
+        The tag of the compound
+
+    Returns
+    -------
+    float
+        The activity in [M]
+    """
     i = solution.idx[tagCompound]
     c = solution.c_molal[i]
     g = solution.gamma[i]
@@ -557,6 +599,40 @@ def get_activity(solution: SolutionResult, tagCompound: str):
 # Internal functions (high level auxiliaries)
 ###########################################################
 ###########################################################
+
+
+def adjust_sys_for_pengrobinson(fugacity_calculation, reaction_system, args):
+    if fugacity_calculation == 'pr': #ugly, to inject the P at p_scalar (is the same P used in args extra)
+        if reaction_system.closing_equation_type != ClosingEquationType.OPEN:
+            raise ValueError('PENGRobinson only for OPEN case at this point')
+        vapours = [sp for sp in reaction_system.species if '(g)' in sp.name]
+        for gas in vapours:
+            gas.p_scalar['P'] = args[2]
+        pass
+    return
+
+    # if ret_fsol:
+    #     return solution, fsol
+    # return solution
+
+def modify_system_for_precipitation(solution, reaction_system):
+    solids_will_precip = [solid for solid, si in solution.saturation_index.items()
+        if si > 0.0
+    ]
+    reac_solid_precip = [[reac for reac in reaction_system.solid_reactions_but_not_equation
+        if reac.type == solid_name][0]
+        for solid_name in solids_will_precip
+    ]
+    ## Check for polymorphs - only the most stable will precipitate
+    d_solids = rbuilder.check_polymorphs_in_reaction(reac_solid_precip, solution.saturation_index)
+
+    ## Convert Reaction Engine to db_reaction:
+    reac_solid_precip_no_polymorph = [reac_solid_precip[i] for _, i in d_solids.values()]
+    reacs_conv_solid_precip = rbuilder.conv_reaction_engine_to_db_like(reac_solid_precip_no_polymorph)
+
+    # Use only the aqueous and solid reaction from previous system (does not use database for liquid)
+    sys_eq_precip = transform_system_to_new_solids_reactions(reaction_system, reacs_conv_solid_precip)
+    return sys_eq_precip
 
 def transform_system_to_new_solids_reactions(reaction_system, reacs_conv_solid_precip):
     # Use only the aqueous and solid reaction from previous system (does not use database for liquid)

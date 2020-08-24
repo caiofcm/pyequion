@@ -34,7 +34,7 @@ Automatic precipitation halted = Its not the same calculation...
 """
 
 # THIS LINE WILL COMPILE FUNCTION with numba
-pyequion.core.jit_compile_functions()
+# pyequion.core.jit_compile_functions()
 
 def test_phreeqpython_nahco3_open():
     comp_dict = {'NaHCO3':1.0}

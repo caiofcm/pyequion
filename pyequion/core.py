@@ -41,7 +41,7 @@ from .data.reactions_solutions import reactions_solutions
 from .data.reactions_solids import reactions_solids
 
 def set_list_type_for_jit():
-    print('in set_list_type_for_jit')
+    # print('in set_list_type_for_jit')
     global List, Dict
     List = numba.typed.List
     Dict = numba.typed.Dict
@@ -1348,11 +1348,19 @@ def jit_compile_functions():
 
 
     # Activity coefficients model compilation
+    conductivity.solution_conductivity = numba.njit()(conductivity.solution_conductivity)
+    act.log10gamma_davies = numba.njit()(act.log10gamma_davies)
+    act.debye_huckel_constant = numba.njit()(act.debye_huckel_constant)
+    act.b_dot_equation = numba.njit()(act.b_dot_equation)
     act.calc_log_gamma_ideal = numba.njit()(act.calc_log_gamma_ideal)
     act.calc_log_gamma_dh_bdot = numba.njit()(act.calc_log_gamma_dh_bdot)
-    conductivity.solution_conductivity = numba.njit()(conductivity.solution_conductivity)
+    act.bromley_model_ion = numba.njit()(act.bromley_model_ion)
+    act.calc_bromley_method = numba.njit()(act.calc_bromley_method)
+    act.calc_sit_method = numba.njit()(act.calc_sit_method)
+    act.calc_log_gamma_pitzer = numba.njit()(act.calc_log_gamma_pitzer)
+    act.calc_log_gamma_dh_bdot_mean_activity_neutral = numba.njit()(act.calc_log_gamma_dh_bdot_mean_activity_neutral)
 
-
+    print('End JIT compilation settings')
     return
 
 

@@ -10,10 +10,6 @@ Welcome to pyequion's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-===============================
-Class documentation and details
-===============================
-
 Main Calculations
 ======================================
 .. automodule:: pyequion.pyequion
