@@ -35,6 +35,7 @@ def solve_solution(comp_dict, reaction_system=None, TC=25.0,
     vapour_equilibrium_phase=None,
     co2_partial_pressure=core.pCO2_ref,
     fugacity_calculation='ideal', #'ideal'or 'pr', maybe a UDF
+    fixed_elements=None,
     jac=None
     ):
     """The main function for equilibrium calculation in PyEquIon
@@ -106,6 +107,10 @@ def solve_solution(comp_dict, reaction_system=None, TC=25.0,
             - 'ideal': ideal gas model - fugacity coefficient ($\\phi = 1$)
             - 'pr': Peng-Robinson model (currently only for CO2)
         , by default 'ideal'
+    fixed_elements : List[str], optional
+        Option to fix the value of an element from input,
+        This is similar to initial_feed_mass_balance, but used to defined ions from input list
+        , by default None
     jac: callable, optional
         A python function for calculating the jacobian of the system,
         by default None
@@ -169,7 +174,7 @@ def solve_solution(comp_dict, reaction_system=None, TC=25.0,
     if reaction_system is None:
         sys_eq = create_equilibrium(feed_compounds,
             close_type, element_mass_balance,
-            initial_feed_mass_balance)
+            initial_feed_mass_balance, fixed_elements=fixed_elements)
     else:
         sys_eq = reaction_system
 
@@ -592,6 +597,43 @@ def get_activity(solution: SolutionResult, tagCompound: str) -> float:
     act = c*g
     return act
 
+
+def get_solution_from_x(esys: EquilibriumSystem, x: np.ndarray,
+    comp_dict,
+    close_type=None,
+    activity_model_type=TypeActivityCalculation.DEBYE,
+    TC: float = 25.0,
+    setup_log_gamma_func=None,
+    calc_log_gamma=None,
+    fugacity_calculation='ideal',
+    carbon_total=0.0,
+    co2_partial_pressure=core.pCO2_ref,
+    activities_db_file_name=None,
+    ) -> SolutionResult:
+
+    if isinstance(activity_model_type, str):
+        activity_model_type = TypeActivityCalculation(activity_model_type.upper())
+
+    setup_log_gamma_func, calc_log_gamma = core.default_activity_logic(
+            activity_model_type, setup_log_gamma_func, calc_log_gamma, fugacity_calculation)
+
+    feed_compounds = esys.feed_compounds
+    comps_vals = [
+        comp_dict[feed]*1e-3 if feed in comp_dict else np.nan
+        for feed in feed_compounds
+    ]
+
+    args = get_args_from_comps_dict(TC, comps_vals, close_type, co2_partial_pressure, carbon_total)
+
+    adjust_sys_for_pengrobinson(fugacity_calculation, esys, args)
+
+    setup_system_for_direct_run(esys, activities_db_file_name, setup_log_gamma_func, TC)
+
+    esys.residual_setup(x, args, calc_log_gamma)
+
+    sol = esys.calculate_properties()
+
+    return sol
 
 
 ###########################################################

@@ -817,6 +817,46 @@ def test_precip_Al2SO43_K3PO4_CaCl2():
 #     assert_solution(solution, solution_ref, tol={'pH': 1e-1, 'I': 1e-1})
 #     return
 
+
+#################################
+####### TEST HELPERs and UTILITIES
+#################################
+
+def test_from_ions_is_equal_to_from_compounds():
+    comps = {'Na+': 10, 'HCO3-': 10, 'Ca++': 5.0, 'Cl-': 10.0}
+    solution_ions = pyequion.solve_solution(comps)
+    pyequion.print_solution(solution_ions)
+
+    comps = {'NaHCO3': 10, 'CaCl2': 5.0}
+    solution_comps = pyequion.solve_solution(comps)
+    pyequion.print_solution(solution_comps)
+
+    assert (np.isclose(solution_ions.pH, solution_comps.pH))
+
+def test_creating_solution_result_from_x():
+
+    feed_compounds = ['Na+', 'HCO3-', 'Ca++', 'Cl-']
+    fixed_elements = ['Cl-']
+
+    sys_eq = pyequion.create_equilibrium(feed_compounds,
+        fixed_elements=fixed_elements,
+    )
+
+    comps = {'Na+': 10, 'HCO3-': 10, 'Ca++': 5.0, 'Cl-': 10.0}
+    solution_exp = pyequion.solve_solution(comps, sys_eq)
+    pyequion.print_solution(solution_exp)
+
+    x = solution_exp.x
+
+    sys_eq2 = pyequion.create_equilibrium(feed_compounds,
+        fixed_elements=fixed_elements,
+    )
+
+    solution_new = pyequion.get_solution_from_x(sys_eq2, x, comps)
+
+
+    assert (np.isclose(solution_exp.pH, solution_new.pH))
+
 ##### Auxiliaries
 def assert_solution(solution, solution_ref, tol=None):
     tol_new = {'pH': 1e-3, 'I': 1e-2}

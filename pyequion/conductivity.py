@@ -151,7 +151,7 @@ def solution_conductivity(I, gamma, conc_vals, charges, cond_molar_zero):
         if charges[i] == 0:
             continue
         if I < 0.36 * charges[i]:
-            alpha = 0.6 / np.sqrt(charges[i])
+            alpha = 0.6 / np.sqrt(np.abs(charges[i])) #CHECKME
         else:
             alpha = np.sqrt(I) / charges[i]
         aux = cond_molar_zero[i] * gamma[i]**alpha * conc_vals[i]

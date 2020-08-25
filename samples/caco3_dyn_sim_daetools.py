@@ -14,40 +14,79 @@ import numpy as np
 from daetools.pyDAE import *
 from daetools.solvers.trilinos import pyTrilinos
 from res_nahco3_cacl2_reduced_T_2 import res as res_speciation
+import pyequion
+import aux_create_dynsim
 
 # import pyequion
 # Standard variable types are defined in variable_types.py
 from pyUnits import J, K, g, kg, kmol, m, mol, s, um
 
-eq_idx_regular = {
-    'size': 14,
+no_small_positive_t = daeVariableType("no_small_positive_t", dimless, 0.0, 1.0,  0.1, 1e-5)
+
+# eq_idx_regular = {
+#     'size': 14,
+#     'Na+': 0,
+#     'HCO3-': 1,
+#     'Ca++': 2,
+#     'OH-': 3,
+#     'H+': 4,
+#     'CO2': 5,
+#     'CaOH+': 6,
+#     'NaOH': 7,
+#     'NaHCO3': 8,
+#     'CO3--': 9,
+#     'CaCO3': 10,
+#     'NaCO3-': 11,
+#     'Na2CO3': 12,
+#     'CaHCO3+': 13,
+#     'H2O': 14,
+#     'Cl-': 15,
+# }
+eq_idx_reduced2 = {
+    'size': 11, #REDUCEC
     'Na+': 0,
     'HCO3-': 1,
     'Ca++': 2,
     'OH-': 3,
     'H+': 4,
     'CO2': 5,
-    'CaOH+': 6,
-    'NaOH': 7,
-    'NaHCO3': 8,
-    'CO3--': 9,
-    'CaCO3': 10,
-    'NaCO3-': 11,
-    'Na2CO3': 12,
-    'CaHCO3+': 13,
-    'H2O': 14,
-    'Cl-': 15,
+    'NaHCO3': 6,
+    'CO3--': 7,
+    'CaCO3': 8,
+    'Na2CO3': 9, #WRONG, fixing
+    'CaHCO3+': 10,
+    'H2O': 11,
+    'Cl-': 12
 }
-eq_idx = eq_idx_regular
+eq_idx = eq_idx_reduced2
 iNa = 0
 iC = 1
 iCa = 2
 iCl = 3
 
-guess_speciation = np.array([7.33051995e-02, 6.43325906e-02, 1.82951191e-02, 7.76126264e-07,
-       2.23776785e-08, 1.90732600e-03, 8.07985599e-08, 2.03684279e-08,
-       1.51672652e-03, 3.62336563e-04, 1.36791361e-03, 1.74388571e-04,
-       1.83235834e-06, 5.33688654e-03])
+sys_eq_aux = aux_create_dynsim.get_caco3_nahco3_equilibrium()
+
+less_factor = 0.1
+CONCS = np.array([
+    0.5*less_factor*150.0e-3,
+    0.5*less_factor*150.0e-3,
+    0.5*less_factor*50.0e-3,
+    0.5*less_factor*2*50.0e-3,
+])
+comps_aux = {
+    'Na+': CONCS[0]*1e3,
+    'HCO3-': CONCS[1]*1e3,
+    'Ca++': CONCS[2]*1e3,
+    'Cl-': CONCS[3]*1e3,
+}
+solution_aux = pyequion.solve_solution(comps_aux, sys_eq_aux)
+guess_speciation = 10**(solution_aux.x)
+# guess_speciation = np.array([7.33051995e-02, 6.43325906e-02, 1.82951191e-02, 7.76126264e-07,
+#        2.23776785e-08, 1.90732600e-03, 8.07985599e-08, 2.03684279e-08,
+#        1.51672652e-03, 3.62336563e-04, 1.36791361e-03, 1.74388571e-04,
+#        1.83235834e-06, 5.33688654e-03])
+
+sol_eq_full = pyequion.solve_solution(comps_aux)
 
 rhoc = 2.709997e3 #kg/m3
 kv = 1.0
@@ -70,7 +109,7 @@ def calc_B(S):
 
     # MODIFY JUST FOR TEST
     # B *= 1e-6 #TOO HIGH VALUES...
-    return B #* 0.0 #MOD
+    return B * 1e-3 #* 0.0 #MOD # : #/kg
 
 def calc_G(S):
     # Verdoes 92
@@ -85,17 +124,21 @@ class modelCaCO3Precip(daeModel):
         daeModel.__init__(self, Name, Parent, Description)
 
         self.Nmoments = daeDomain("Nmoments", self, dimless, "Number of Moments")
-        self.NSpecies = daeDomain("NSpecies", self, dimless, "Number of Species")
-        self.NElementTotal = daeDomain("NElementTotal", self, dimless, "Number of Elements")
-
         self.mus = daeVariable("mus", no_t, self, "Particle Moment concentrations", [self.Nmoments])
         self.lmin = daeParameter("lmin", dimless, self, "Minimal size")
         self.G = daeVariable("G", no_t, self, "Growth rate")
         self.B0 = daeVariable("B0", no_t, self, "Nucleation rate")
-        self.conc_species = daeVariable("conc_species", no_t, self, "Conc Species", [self.NSpecies])
-        self.conc_element_total = daeVariable("conc_element_total", no_t, self, "Conc Element Total", [self.NElementTotal])
-        self.S = daeVariable("S", no_t, self, "Supersaturation")
 
+        self.NSpecies = daeDomain("NSpecies", self, dimless, "Number of Species")
+        self.NElementTotal = daeDomain("NElementTotal", self, dimless, "Number of Elements")
+        # self.conc_species = daeVariable("conc_species", no_t, self, "Conc Species", [self.NSpecies])
+        self.x_species = daeVariable("x_species", no_t, self, "Conc Species", [self.NSpecies])
+        self.conc_element_total = daeVariable("conc_element_total", no_t, self, "Conc Element Total", [self.NElementTotal])
+        # self.iap = daeVariable("iap", no_t, self, "Ionic Activity Product")
+        self.S = daeVariable("S", no_t, self, "Supersaturation")
+        self.aCapp = daeVariable("aCapp", no_t, self, "Ca++ Activity")
+        self.aCO3mm = daeVariable("aCO3mm", no_t, self, "CO3-- Activity")
+        self.pH = daeVariable("pH", no_t, self, "pH")
 
     def DeclareEquations(self):
         daeModel.DeclareEquations(self)
@@ -108,12 +151,18 @@ class modelCaCO3Precip(daeModel):
         cCl = self.conc_element_total(iCl)
         C = [cNa, cC, cCa, cCl]
 
+        kappa = 1e-6 #Constant(1e-6 * m) #dimensionless auxiliary param
+        mu0_ref = 1e20 #Constant(1e20 * m**(-3)) #dimensionless auxiliary param
+        # mu_refs = [mu0_ref*kappa**k for k in range(0,4)]
+
         "Element Conservation"
 
         for j in range(0, n_elements):
             eq = self.CreateEquation("EleConservation({})".format(j), "")
+            mu2_dim = self.mus(2) * mu0_ref * kappa**2
+            G_dim = self.G() * kappa
             eq.Residual = dt(C[j]) - (
-                -3.0*f_cryst_mol[j]*kv*rhoc*self.mus(2)*self.G()
+                -3.0*f_cryst_mol[j]*kv*rhoc*mu2_dim*G_dim
             )
             eq.CheckUnitsConsistency = False
 
@@ -126,37 +175,67 @@ class modelCaCO3Precip(daeModel):
         for j in range(1, 4):
             eq = self.CreateEquation("Moment({})".format(j), "")
             eq.Residual = dt(self.mus(j)) - (
-                j*self.G()*self.mus(j-1) + self.B0()*self.lmin()**j
+                j*self.G()*self.mus(j-1) #+ self.B0()*self.lmin()**j
             )
             eq.CheckUnitsConsistency = False
 
         "Nucleation Rate"
+        # S = 2.0 #TO DO.
+        S = self.S()
 
         eq = self.CreateEquation("NucleationRate", "")
-        eq.Residual = self.B0() - calc_B(S)
+        # eq.Residual = self.B0() - calc_B(S)*1e-8
+        B0_calc = calc_B(S)
+        eq.Residual = self.B0() - (B0_calc / mu0_ref)
 
         "Growth Rate"
 
         eq = self.CreateEquation("GrowthRate", "")
-        eq.Residual = self.G() - calc_G(S)
+        # eq.Residual = self.G() - calc_G(S)
+        eq.Residual = self.G() - (calc_G(S) / kappa)
 
         "Chemical Speciation"
 
-        x_speciation = [
-            np.log10(self.conc_species(j))
-            for j in range(n_species)
-        ]
         T = 25.0 + 273.15 #K
         args_speciation = ([cNa, cC, cCa, cCl], T, np.nan)
 
-        res_species = res_speciation(x_speciation, args_speciation)
+        x = [self.x_species(j) for j in range(n_species)]
+        res_species = res_speciation(x, args_speciation)
         for i_sp in range(0, n_species):
             eq = self.CreateEquation("c_species({})".format(i_sp))
-            eq.Residual = res_species[i_sp] #*dae.Constant(1*mol/kg)
+            eq.Residual = res_species[i_sp]
+
+        molal_species = [
+            np.log10(self.x_species(j))
+            for j in range(n_species)
+        ]
+
+        comps = {
+            'Na+': cNa,
+            'HCO3-': cC,
+            'Ca++': cCa,
+            'Cl-': cCl,
+        }
+        solution = pyequion.get_solution_from_x(sys_eq_aux, x, comps)
+
+        "pH"
+        eq = self.CreateEquation("pH", "")
+        eq.Residual = self.pH() - solution.pH
 
         "Supersaturation"
+        aCapp = pyequion.get_activity(solution, 'Ca++')
+        aCO3mm = pyequion.get_activity(solution, 'CO3--')
+        Ksp = 10**(solution.log_K_solubility['Calcite'])
+        iap = solution.ionic_activity_prod['Calcite']
 
-        S = 2.0 #TO DO.
+        eq = self.CreateEquation("aCapp", "")
+        eq.Residual = self.aCapp() - aCapp
+
+        eq = self.CreateEquation("aCapp", "")
+        eq.Residual = self.aCO3mm() - aCO3mm
+
+        eq = self.CreateEquation("S", "")
+        eq.Residual = self.S() - Sqrt(aCapp*aCO3mm / Ksp)
 
         pass
 
@@ -178,23 +257,31 @@ class simTutorial(daeSimulation):
         self.m.mus.SetInitialConditions(np.zeros(nMus))
 
         for i_sp in range(0, self.m.NSpecies.NumberOfPoints):
-            self.m.conc_species.SetInitialGuess(i_sp, guess_speciation[i_sp])
+            # self.m.conc_species.SetInitialGuess(i_sp, guess_speciation[i_sp])
+            self.m.x_species.SetInitialGuess(i_sp, solution_aux.x[i_sp])
 
-        self.m.conc_element_total.SetInitialConditions(np.array([
-            0.5*150.0e-3,
-            0.5*150.0e-3,
-            0.5*50.0e-3,
-            0.5*2*50.0e-3,
-        ]))
+        self.m.conc_element_total.SetInitialConditions(CONCS)
+
+        # self.m.iap.SetInitialGuess(1e-6)
+        guess_aCapp = pyequion.get_activity(solution_aux, 'Ca++')
+        guess_aCO3mm = pyequion.get_activity(solution_aux, 'CO3--')
+        S = (solution_aux.ionic_activity_prod['Calcite']/10**(solution_aux.log_K_solubility['Calcite']))**0.5
+        self.m.pH.SetInitialGuess(solution_aux.pH)
+        self.m.aCapp.SetInitialGuess(guess_aCapp)
+        self.m.aCO3mm.SetInitialGuess(guess_aCO3mm)
+        self.m.S.SetInitialGuess(S)
 
         pass
 
 def run(**kwargs):
     simulation = simTutorial()
     print('Supported Trilinos solvers: %s' % pyTrilinos.daeTrilinosSupportedSolvers())
-    lasolver = pyTrilinos.daeCreateTrilinosSolver("Amesos_Klu", "")
-    return daeActivity.simulate(simulation, reportingInterval = 600,
-                                            timeHorizon       = 10*3600,
+    # lasolver = pyTrilinos.daeCreateTrilinosSolver("Amesos_Klu", "")
+    lasolver = pyTrilinos.daeCreateTrilinosSolver("Amesos_Umfpack", "")
+    # lasolver = pyTrilinos.daeCreateTrilinosSolver("Amesos_Lapack", "")
+    # lasolver = pyTrilinos.daeCreateTrilinosSolver("'AztecOO_ML", "")
+    return daeActivity.simulate(simulation, reportingInterval = 60,
+                                            timeHorizon       = 20*60,
                                             lasolver          = lasolver,
                                             **kwargs)
 

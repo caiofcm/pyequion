@@ -729,6 +729,56 @@ class EquilibriumSystem():
         res[i_prev] = self.charge_conservation()
         return res
 
+    def residual_setup(self, x, args, calc_log_gamma):
+        """Calculate the residual for the nonlinear system equilibrium
+
+        Parameters
+        ----------
+        x : float[:]
+            Values of log molal
+        args : tuple
+            Arguments: (c_feed [float[:]], T [float])
+        calc_log_gamma : callable
+            Function for the nonideality calculation
+
+        Returns
+        -------
+        float[:]
+            Residual for the equilibrium system
+        """
+        cFeed = args[0] #self.c_feed, self.TK, self.pCO2
+        TK = args[1] #self.c_feed, self.TK, self.pCO2
+        self.TK = TK #Mutating: saving the last temperature for SolutionResult call
+        if self.closing_equation_type == 0:
+            pCO2 = args[2]
+            logPCO2 = np.log10(pCO2)
+        elif self.closing_equation_type == 1:
+            carbone_total = args[2]
+        elif self.closing_equation_type == 2:
+            pH = args[2]
+        idx = self.idx_control.idx
+
+        # FIXME: water concentration fixed:
+        self.species[idx['H2O']].logc = 0.0
+
+        for i in range(idx['size']):
+            self.species[i].logc = x[i] #FIXME: engine not mapping && error for engine usage CO2g is not unknown variable, how to remove it?
+
+        # Forced species:
+        if self.is_there_known_mb:
+            # self.species[idx.Clm].logc = np.log10(2*cFeed[0])
+            for mb in self.mass_balances_known:
+                if mb.use_constant_value:
+                    if mb.idx_feed[0][0] > -1:
+                        mb.known_specie_from_feed(self.species, cFeed)
+                    continue
+                mb.known_specie_from_feed(self.species, cFeed)
+
+        I = self.get_I()
+
+        calc_log_gamma(self.idx_control, self.species, I, TK)
+        pass
+
     def charge_conservation(self):
         """Residual for charge conservation
 
@@ -772,7 +822,10 @@ class EquilibriumSystem():
         -------
         float[:]
         """
-        v = np.empty(len(self.species))
+        if isinstance(self.species[0].logc, float):
+            v = np.empty(len(self.species))
+        else:
+            v = np.empty(len(self.species), dtype=object)
         for i, sp in enumerate(self.species):
             v[i] = 10.0**(sp.logg)
         return v
@@ -785,7 +838,10 @@ class EquilibriumSystem():
         -------
         float[:]
         """
-        v = np.empty(len(self.species))
+        if isinstance(self.species[0].logc, float):
+            v = np.empty(len(self.species))
+        else:
+            v = np.empty(len(self.species), dtype=object)
         for i, sp in enumerate(self.species):
             v[i] = 10.0**(sp.logc)
         return v
@@ -847,11 +903,15 @@ class EquilibriumSystem():
 
         if self.solid_reactions_but_not_equation[0].type == 'dummy':
             return np.array([np.nan]), np.array([np.nan]), [''], np.array([np.nan]), np.array([np.nan])
-        SI = np.zeros(len(self.solid_reactions_but_not_equation), dtype=np.float64)
-        arr_log_Ksp = np.zeros(len(self.solid_reactions_but_not_equation), dtype=np.float64)
-        IAP = np.zeros(len(self.solid_reactions_but_not_equation), dtype=np.float64)
+        if isinstance(self.species[0].logc, float):
+            dtype_aux = np.float64
+        else:
+            dtype_aux = object
+        SI = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
+        arr_log_Ksp = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
+        IAP = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
         solids_names = [''] * len(self.solid_reactions_but_not_equation)
-        precipitation_molalities = np.zeros(len(self.solid_reactions_but_not_equation), dtype=np.float64)
+        precipitation_molalities = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
         for i, solid_react in enumerate(self.solid_reactions_but_not_equation):
             # idxs_ions = [ii for ii in solid_react.idx_species if ii >= 0]
             idxs_ions = List()
@@ -961,8 +1021,8 @@ if os.getenv('NUMBA_DISABLE_JIT') == "1":
 def update_esys_from_molal_vector(esys: EquilibriumSystem, log_molal_vec, TK):
     esys.TK = TK
     [esys.set_specie_logc(i, logc) for i, logc in enumerate(log_molal_vec)]
-    solution = esys.calculate_properties()
-    return solution
+    # solution = esys.calculate_properties()
+    # return solution
 
 def create_numerical_equilibrium_jacobian(sys_eq):
     "TODO.."
