@@ -239,7 +239,7 @@ class modelCaCO3Precip(daeModel):
         eq.Residual = self.S() - Sqrt(aCapp*aCO3mm / Ksp)
 
         "Mass of Crystal in Bulk"
-        eq = model.CreateEquation("massConcCrystlBulk({})".format(i_cstr), "")
+        eq = self.CreateEquation("massConcCrystlBulk", "")
         eq.Residual = self.massConcCrystalBulk() - (self.mus(3)*kappa**3*mu0_ref) * rhoc * kv
 
         pass
