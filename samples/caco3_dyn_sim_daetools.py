@@ -139,6 +139,7 @@ class modelCaCO3Precip(daeModel):
         self.aCapp = daeVariable("aCapp", no_t, self, "Ca++ Activity")
         self.aCO3mm = daeVariable("aCO3mm", no_t, self, "CO3-- Activity")
         self.pH = daeVariable("pH", no_t, self, "pH")
+        self.massConcCrystalBulk = daeVariable("massConcCrystalBulk", no_t, self, "massConcCrystalBulk")
 
     def DeclareEquations(self):
         daeModel.DeclareEquations(self)
@@ -236,6 +237,10 @@ class modelCaCO3Precip(daeModel):
 
         eq = self.CreateEquation("S", "")
         eq.Residual = self.S() - Sqrt(aCapp*aCO3mm / Ksp)
+
+        "Mass of Crystal in Bulk"
+        eq = model.CreateEquation("massConcCrystlBulk({})".format(i_cstr), "")
+        eq.Residual = self.massConcCrystalBulk() - (self.mus(3)*kappa**3*mu0_ref) * rhoc * kv
 
         pass
 
