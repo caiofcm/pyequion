@@ -1,5 +1,6 @@
 
 from . import activity_coefficients as act
+from . import properties_utils
 # from .reactions_constants import *
 from .properties_utils import solve_with_exception, pCO2_ref
 import numpy
@@ -822,14 +823,18 @@ class EquilibriumSystem():
         -------
         float[:]
         """
-        if isinstance(self.species[0].logc, float):
-            v = np.empty(len(self.species))
-        else:
-            v = np.empty(len(self.species), dtype=object)
+        # if isinstance(self.species[0].logc, float):
+        #     v = np.empty(len(self.species))
+        # else:
+        #     v = np.empty(len(self.species), dtype=object)
+        # for i, sp in enumerate(self.species):
+        #     v[i] = 10.0**(sp.logg)
+        # return v
+        # return np.array([10.0**(sp.logg) for sp in self.species])
+        v = np.empty(len(self.species))
         for i, sp in enumerate(self.species):
             v[i] = 10.0**(sp.logg)
         return v
-        # return np.array([10.0**(sp.logg) for sp in self.species])
 
     def get_molal_conc(self):
         """Get molal concentration
@@ -838,14 +843,18 @@ class EquilibriumSystem():
         -------
         float[:]
         """
-        if isinstance(self.species[0].logc, float):
-            v = np.empty(len(self.species))
-        else:
-            v = np.empty(len(self.species), dtype=object)
+        # if isinstance(self.species[0].logc, float):
+        #     v = np.empty(len(self.species))
+        # else:
+        #     v = np.empty(len(self.species), dtype=object)
+        # for i, sp in enumerate(self.species):
+        #     v[i] = 10.0**(sp.logc)
+        # return v
+        # return np.array([10.0**(sp.logc) for sp in self.species])
+        v = np.empty(len(self.species))
         for i, sp in enumerate(self.species):
             v[i] = 10.0**(sp.logc)
         return v
-        # return np.array([10.0**(sp.logc) for sp in self.species])
 
     # def get_molal_unknowns(self):
     #     # Ignoring knowns, since maybe wrong
@@ -903,10 +912,11 @@ class EquilibriumSystem():
 
         if self.solid_reactions_but_not_equation[0].type == 'dummy':
             return np.array([np.nan]), np.array([np.nan]), [''], np.array([np.nan]), np.array([np.nan])
-        if isinstance(self.species[0].logc, float):
-            dtype_aux = np.float64
-        else:
-            dtype_aux = object
+        # if isinstance(self.species[0].logc, float):
+        #     dtype_aux = np.float64
+        # else:
+        #     dtype_aux = object
+        dtype_aux = np.float64
         SI = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
         arr_log_Ksp = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
         IAP = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
@@ -1148,67 +1158,6 @@ def generate_symbolic_residual(sys_eq, return_symbols=True,
         return res, x, args
     return res
 
-def save_jacobian_of_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
-    setup_log_gamma=None, calc_log_gamma=None, activities_db_file_name=None, activity_model_type=act.TypeActivityCalculation.DEBYE):
-    """Save Jacobian of residual function to file
-
-    Parameters
-    ----------
-    sys_eq : EquilibriumSystem
-
-    loc_path : str
-        Path for saving the function
-    fun_name : str
-        Function name
-    fixed_temperature : float, optional
-        Fix temperature to remove from symbolic evaluation, by default None
-    """
-    res, x, args = generate_symbolic_residual(sys_eq, True,
-        setup_log_gamma, calc_log_gamma, fixed_temperature, activities_db_file_name, activity_model_type)
-    J = mod_sym.obtain_symbolic_jacobian(res, x)
-    s = mod_sym.string_lambdastr_as_function(
-        J, x, args, fun_name,
-        use_numpy=True, include_imports=True
-    )
-    s = mod_sym.numbafy_function_string(s,
-        numba_kwargs_string='cache=True', func_additional_arg='dummy=None') #added calc
-    mod_sym.save_function_string_to_file(s, loc_path)
-    mod_sym.return_to_sympy_to_numpy()
-    pass
-
-def save_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
-    setup_log_gamma=None, calc_log_gamma=None,
-    activities_db_file_name=None,
-    activity_model_type=act.TypeActivityCalculation.DEBYE,
-    use_numpy=True, include_imports=True,
-    numbafy=False):
-    """Save residual function to file
-
-    Parameters
-    ----------
-    sys_eq : EquilibriumSystem
-
-    loc_path : str
-        Path for saving the function
-    fun_name : str
-        Function name
-    fixed_temperature : float, optional
-        Fix temperature to remove from symbolic evaluation, by default None
-    """
-    res, x, args = generate_symbolic_residual(sys_eq, True,
-        setup_log_gamma, calc_log_gamma, fixed_temperature, activities_db_file_name, activity_model_type)
-    # J = mod_sym.obtain_symbolic_jacobian(res, x)
-    s = mod_sym.string_lambdastr_as_function(
-        res, x, args, fun_name,
-        use_numpy=use_numpy, include_imports=include_imports
-    )
-    if numbafy:
-        s = mod_sym.numbafy_function_string(s,
-            numba_kwargs_string='cache=True', func_additional_arg='dummy=None') #added calc
-    mod_sym.save_function_string_to_file(s, loc_path)
-    mod_sym.return_to_sympy_to_numpy()
-    pass
-
 
 #####
 #####
@@ -1424,12 +1373,115 @@ def jit_compile_functions():
     act.calc_sit_method = numba.njit()(act.calc_sit_method)
     act.calc_log_gamma_pitzer = numba.njit()(act.calc_log_gamma_pitzer)
     act.calc_log_gamma_dh_bdot_mean_activity_neutral = numba.njit()(act.calc_log_gamma_dh_bdot_mean_activity_neutral)
-    act.dieletricconstant_water = numba.njit()(act.dieletricconstant_water)
-    act.density_water = numba.njit()(act.density_water)
+    properties_utils.dieletricconstant_water = numba.njit()(properties_utils.dieletricconstant_water)
+    properties_utils.density_water = numba.njit()(properties_utils.density_water)
 
     print('End JIT compilation settings')
     return
 
 
 
+##########################
+# Extended Equilibrium for NON FLOAT CASE
+##########################
 
+# class EquilibriumSystemNonFloat(EquilibriumSystem):
+
+#     def get_gamma(self):
+#         """Get log gamma
+
+#         Returns
+#         -------
+#         float[:]
+#         """
+#         # if isinstance(self.species[0].logc, float):
+#         #     v = np.empty(len(self.species))
+#         # else:
+#         #     v = np.empty(len(self.species), dtype=object)
+#         # for i, sp in enumerate(self.species):
+#         #     v[i] = 10.0**(sp.logg)
+#         # return v
+#         # return np.array([10.0**(sp.logg) for sp in self.species])
+#         v = np.empty(len(self.species))
+#         for i, sp in enumerate(self.species):
+#             v[i] = 10.0**(sp.logg)
+#         return v
+
+#     def get_molal_conc(self):
+#         """Get molal concentration
+
+#         Returns
+#         -------
+#         float[:]
+#         """
+#         # if isinstance(self.species[0].logc, float):
+#         #     v = np.empty(len(self.species))
+#         # else:
+#         #     v = np.empty(len(self.species), dtype=object)
+#         # for i, sp in enumerate(self.species):
+#         #     v[i] = 10.0**(sp.logc)
+#         # return v
+#         # return np.array([10.0**(sp.logc) for sp in self.species])
+#         v = np.empty(len(self.species))
+#         for i, sp in enumerate(self.species):
+#             v[i] = 10.0**(sp.logc)
+#         return v
+
+#     def calc_SI_and_IAP_precipitation(self):
+#         TK = self.TK #25.0+273.15 #FIXME: EqReaction should be aware of the temperature IMPORTANT FIX
+
+#         if self.solid_reactions_but_not_equation[0].type == 'dummy':
+#             return np.array([np.nan]), np.array([np.nan]), [''], np.array([np.nan]), np.array([np.nan])
+#         # if isinstance(self.species[0].logc, float):
+#         #     dtype_aux = np.float64
+#         # else:
+#         #     dtype_aux = object
+#         dtype_aux = np.float64
+#         SI = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
+#         arr_log_Ksp = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
+#         IAP = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
+#         solids_names = [''] * len(self.solid_reactions_but_not_equation)
+#         precipitation_molalities = np.zeros(len(self.solid_reactions_but_not_equation), dtype=dtype_aux)
+#         for i, solid_react in enumerate(self.solid_reactions_but_not_equation):
+#             # idxs_ions = [ii for ii in solid_react.idx_species if ii >= 0]
+#             idxs_ions = List()
+#             for tag, ii in zip(solid_react.species_tags, solid_react.idx_species):
+#                 # if not ('(s)' in tag) and (tag != 'H2O'): #FIXME
+#                 check_s_in = '(s)' in tag
+#                 if not check_s_in: #and (tag != 'H2O'):  why did I removed water?
+#                     idxs_ions.append(ii)
+
+#             solids_names[i] = solid_react.type
+#             solid_specie_tag = [tag for tag in solid_react.species_tags if '(s)' in tag][0]
+#             idx_solids = self.get_specie_idx_in_list(solid_specie_tag)
+#             # solids = [self.species[ii] for ii in idxs_ions if abs(self.species[ii].z) == 0] #FIXME: Possible problem if any non charged specie
+#             # if len(solids) > 0:
+#             if idx_solids > -1: #FIXME Order is not maching correctly the phases -> USE DICT IMPORTANT
+#                 solid = self.species[idx_solids]
+#                 # solids_names[i] = solids[0].name #is only one element anyway
+#                 solid_logc = solid.logc
+#                 precipitation_molalities[i] = 10.0**solid_logc
+
+#             aqueous_species = [self.species[ii] for ii in idxs_ions if self.species[ii].phase in [0, 3]] #Including Water? Checkme
+#             idx_species_in_reaction = [solid_react.species_tags.index(sp.name) for sp in aqueous_species]
+#             coefs_in_reaction = [solid_react.stoic_coefs[idx] for idx in idx_species_in_reaction]
+#             log_activities = [sp.logact() for sp in aqueous_species]
+
+#             # coef_ref = [abs(self.species[ii].z) for ii in idxs_ions if abs(self.species[ii].z) > 0]
+#             # coef_ref = coef_ref[0]
+#             # log_activities = np.array([self.species[ii].logact() for ii in idxs_ions])
+#             # log_Ksp = logK[solid_react.idx_reaction_db]
+#             log_Ksp = solid_react.calc_reaction_constant(TK)
+#             # SI[i] = 1/coef_ref * (np.sum(log_activities) - log_Ksp)
+#             sum_loga = 0.0
+#             for loga, coef in zip(log_activities, coefs_in_reaction):
+#                 sum_loga += coef * loga #Numba bug -> cannot understand
+#             #sum_logact = [ for loga in log_activities]
+#             # SI[i] = 1/1.0 * (np.sum(log_activities) - log_Ksp) #FIXME: confirm if SI uses the (.)**(1/eta)
+#             IAP[i] = 10.0**sum_loga
+#             SI[i] = 1/1.0 * (sum_loga - log_Ksp)
+#             arr_log_Ksp[i] = log_Ksp
+
+#             # SI[i] = solid_react.idx_reaction_db
+
+#         return SI, IAP, solids_names, precipitation_molalities, arr_log_Ksp

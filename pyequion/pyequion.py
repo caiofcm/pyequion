@@ -4,23 +4,26 @@ import os
 import numpy as np
 from scipy import optimize
 
-from . import core
+from . import \
+    reactions_constants  # this is outdated, I am only using the logK_H ...
+from . import activity_coefficients, core
 from . import reactions_species_builder as rbuilder
-from .reactions_species_builder import display_reactions, ipython_display_reactions
-from . import utils
-from . import utils_api
-from .core import DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult, jit_compile_functions
+from . import utils, utils_api
+from .activity_coefficients import (
+    TypeActivityCalculation, calc_log_gamma_dh_bdot,
+    calc_log_gamma_dh_bdot_mean_activity_neutral, calc_log_gamma_ideal,
+    calc_log_gamma_pitzer, setup_log_gamma_bdot,
+    setup_log_gamma_bdot_mean_activity_neutral, setup_log_gamma_ideal,
+    setup_log_gamma_pitzer)
+from .core import (DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult,
+                   jit_compile_functions)
 from .properties_utils import pCO2_ref, solve_with_exception
+from .reactions_species_builder import (display_reactions,
+                                        ipython_display_reactions)
 from .utils import ClosingEquationType, get_dissociating_ions
-from . import activity_coefficients
-from . import reactions_constants #this is outdated, I am only using the logK_H ...
-from .activity_coefficients import TypeActivityCalculation,\
-    setup_log_gamma_ideal, calc_log_gamma_ideal,\
-    setup_log_gamma_bdot, calc_log_gamma_dh_bdot,\
-    setup_log_gamma_bdot_mean_activity_neutral, calc_log_gamma_dh_bdot_mean_activity_neutral,\
-    setup_log_gamma_pitzer, calc_log_gamma_pitzer
+from .utils_for_numba import Dict, List
 
-from .core import save_jacobian_of_res_to_file, save_res_to_file
+# from .core import save_jacobian_of_res_to_file, save_res_to_file
 
 def solve_solution(comp_dict, reaction_system=None, TC=25.0,
     close_type=None, carbon_total=0.0,
@@ -631,9 +634,77 @@ def get_solution_from_x(esys: EquilibriumSystem, x: np.ndarray,
 
     esys.residual_setup(x, args, calc_log_gamma)
 
-    sol = esys.calculate_properties()
+    # sol = esys.calculate_properties()
+    sol = calculate_properties_non_jitted(esys)
 
     return sol
+
+
+#################################################
+# Symbolic Function: Jacobian and code generation
+#################################################
+
+def save_jacobian_of_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
+    setup_log_gamma=None, calc_log_gamma=None, activities_db_file_name=None, activity_model_type=TypeActivityCalculation.DEBYE):
+    """Save Jacobian of residual function to file
+
+    Parameters
+    ----------
+    sys_eq : EquilibriumSystem
+
+    loc_path : str
+        Path for saving the function
+    fun_name : str
+        Function name
+    fixed_temperature : float, optional
+        Fix temperature to remove from symbolic evaluation, by default None
+    """
+    res, x, args = generate_symbolic_residual(sys_eq, True,
+        setup_log_gamma, calc_log_gamma, fixed_temperature, activities_db_file_name, activity_model_type)
+    J = mod_sym.obtain_symbolic_jacobian(res, x)
+    s = mod_sym.string_lambdastr_as_function(
+        J, x, args, fun_name,
+        use_numpy=True, include_imports=True
+    )
+    s = mod_sym.numbafy_function_string(s,
+        numba_kwargs_string='cache=True', func_additional_arg='dummy=None') #added calc
+    mod_sym.save_function_string_to_file(s, loc_path)
+    mod_sym.return_to_sympy_to_numpy()
+    pass
+
+def save_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
+    setup_log_gamma=None, calc_log_gamma=None,
+    activities_db_file_name=None,
+    activity_model_type=TypeActivityCalculation.DEBYE,
+    use_numpy=True, include_imports=True,
+    numbafy=False):
+    """Save residual function to file
+
+    Parameters
+    ----------
+    sys_eq : EquilibriumSystem
+
+    loc_path : str
+        Path for saving the function
+    fun_name : str
+        Function name
+    fixed_temperature : float, optional
+        Fix temperature to remove from symbolic evaluation, by default None
+    """
+    res, x, args = generate_symbolic_residual(sys_eq, True,
+        setup_log_gamma, calc_log_gamma, fixed_temperature, activities_db_file_name, activity_model_type)
+    # J = mod_sym.obtain_symbolic_jacobian(res, x)
+    s = mod_sym.string_lambdastr_as_function(
+        res, x, args, fun_name,
+        use_numpy=use_numpy, include_imports=include_imports
+    )
+    if numbafy:
+        s = mod_sym.numbafy_function_string(s,
+            numba_kwargs_string='cache=True', func_additional_arg='dummy=None') #added calc
+    mod_sym.save_function_string_to_file(s, loc_path)
+    mod_sym.return_to_sympy_to_numpy()
+    pass
+
 
 
 ###########################################################
@@ -702,3 +773,181 @@ def transform_system_to_new_solids_reactions(reaction_system, reacs_conv_solid_p
     )
     sys_eq_precip.fugacity_calculation = reaction_system.fugacity_calculation
     return sys_eq_precip
+
+
+
+#####
+# Auxiliary for NON JITTED Code (usefull for the daetools integration where numpy arrays are object of adouble)
+#####
+
+def get_gamma_non_jitted(esys):
+    """Get log gamma
+
+    Returns
+    -------
+    float[:]
+    """
+    if isinstance(esys.species[0].logc, float):
+        v = np.empty(len(esys.species))
+    else:
+        v = np.empty(len(esys.species), dtype=object)
+    for i, sp in enumerate(esys.species):
+        v[i] = 10.0**(sp.logg)
+    return v
+    # return np.array([10.0**(sp.logg) for sp in self.species])
+    # v = np.empty(len(self.species))
+    # for i, sp in enumerate(self.species):
+    #     v[i] = 10.0**(sp.logg)
+    # return v
+
+def get_molal_conc_non_jitted(esys):
+    """Get molal concentration
+
+    Returns
+    -------
+    float[:]
+    """
+    if isinstance(esys.species[0].logc, float):
+        v = np.empty(len(esys.species))
+    else:
+        v = np.empty(len(esys.species), dtype=object)
+    for i, sp in enumerate(esys.species):
+        v[i] = 10.0**(sp.logc)
+    return v
+    # return np.array([10.0**(sp.logc) for sp in self.species])
+    # v = np.empty(len(self.species))
+    # for i, sp in enumerate(self.species):
+    #     v[i] = 10.0**(sp.logc)
+    return v
+
+def calc_SI_and_IAP_precipitation_non_jitted(esys):
+    TK = esys.TK #25.0+273.15 #FIXME: EqReaction should be aware of the temperature IMPORTANT FIX
+
+    if esys.solid_reactions_but_not_equation[0].type == 'dummy':
+        return np.array([np.nan]), np.array([np.nan]), [''], np.array([np.nan]), np.array([np.nan])
+    if isinstance(esys.species[0].logc, float):
+        dtype_aux = np.float64
+    else:
+        dtype_aux = object
+    # dtype_aux = np.float64
+    SI = np.zeros(len(esys.solid_reactions_but_not_equation), dtype=dtype_aux)
+    arr_log_Ksp = np.zeros(len(esys.solid_reactions_but_not_equation), dtype=dtype_aux)
+    IAP = np.zeros(len(esys.solid_reactions_but_not_equation), dtype=dtype_aux)
+    solids_names = [''] * len(esys.solid_reactions_but_not_equation)
+    precipitation_molalities = np.zeros(len(esys.solid_reactions_but_not_equation), dtype=dtype_aux)
+    for i, solid_react in enumerate(esys.solid_reactions_but_not_equation):
+        # idxs_ions = [ii for ii in solid_react.idx_species if ii >= 0]
+        idxs_ions = List()
+        for tag, ii in zip(solid_react.species_tags, solid_react.idx_species):
+            # if not ('(s)' in tag) and (tag != 'H2O'): #FIXME
+            check_s_in = '(s)' in tag
+            if not check_s_in: #and (tag != 'H2O'):  why did I removed water?
+                idxs_ions.append(ii)
+
+        solids_names[i] = solid_react.type
+        solid_specie_tag = [tag for tag in solid_react.species_tags if '(s)' in tag][0]
+        idx_solids = esys.get_specie_idx_in_list(solid_specie_tag)
+        # solids = [esys.species[ii] for ii in idxs_ions if abs(esys.species[ii].z) == 0] #FIXME: Possible problem if any non charged specie
+        # if len(solids) > 0:
+        if idx_solids > -1: #FIXME Order is not maching correctly the phases -> USE DICT IMPORTANT
+            solid = esys.species[idx_solids]
+            # solids_names[i] = solids[0].name #is only one element anyway
+            solid_logc = solid.logc
+            precipitation_molalities[i] = 10.0**solid_logc
+
+        aqueous_species = [esys.species[ii] for ii in idxs_ions if esys.species[ii].phase in [0, 3]] #Including Water? Checkme
+        idx_species_in_reaction = [solid_react.species_tags.index(sp.name) for sp in aqueous_species]
+        coefs_in_reaction = [solid_react.stoic_coefs[idx] for idx in idx_species_in_reaction]
+        log_activities = [sp.logact() for sp in aqueous_species]
+
+        # coef_ref = [abs(self.species[ii].z) for ii in idxs_ions if abs(self.species[ii].z) > 0]
+        # coef_ref = coef_ref[0]
+        # log_activities = np.array([self.species[ii].logact() for ii in idxs_ions])
+        # log_Ksp = logK[solid_react.idx_reaction_db]
+        log_Ksp = solid_react.calc_reaction_constant(TK)
+        # SI[i] = 1/coef_ref * (np.sum(log_activities) - log_Ksp)
+        sum_loga = 0.0
+        for loga, coef in zip(log_activities, coefs_in_reaction):
+            sum_loga += coef * loga #Numba bug -> cannot understand
+        #sum_logact = [ for loga in log_activities]
+        # SI[i] = 1/1.0 * (np.sum(log_activities) - log_Ksp) #FIXME: confirm if SI uses the (.)**(1/eta)
+        IAP[i] = 10.0**sum_loga
+        SI[i] = 1/1.0 * (sum_loga - log_Ksp)
+        arr_log_Ksp[i] = log_Ksp
+
+        # SI[i] = solid_react.idx_reaction_db
+
+    return SI, IAP, solids_names, precipitation_molalities, arr_log_Ksp
+
+def get_sc_non_jitted(esys):
+    """Get Conductivivty
+
+    Returns
+    -------
+    float
+    """
+    I = esys.get_I()
+    gm = esys.gamma
+    c = esys.molar_conc #assuming this is already defined!
+    charges = np.empty(len(esys.species))
+    for i, sp in enumerate(esys.species):
+        charges[i] = sp.z
+    # charges = np.array([sp.z for sp in esys.species])
+    cond_zero = np.zeros(len(esys.species))
+    for i, sp in enumerate(esys.species):
+        cond_zero[i] = sp.cond_molar
+    # cond_zero = np.array([conductivity_molar_zero[sp.idx_db] #FIXME conductivity parameters for species into db!!! PROGRAM BREAK!!
+    #                       for sp in self.species])
+    return core.conductivity.solution_conductivity(I, gm, c, charges, cond_zero)
+
+def calculate_properties_non_jitted(esys_ref: EquilibriumSystem, successfull=True):
+    """Calculate properties of solution
+    Similar to EquilibriumSystem, but allowing code that do not work with Jitted function
+
+    Returns
+    -------
+    SolutionResult
+    """
+    # self = esys_ref
+
+    esys_ref.molar_conc = get_molal_conc_non_jitted(esys_ref)
+    esys_ref.gamma = get_gamma_non_jitted(esys_ref)
+
+    # Reporting only the unknowns (why I'v added this?)
+    i_max = esys_ref.idx_control.idx['size']
+    # molal_conc = esys_ref.molar_conc[:i_max]
+    # molal_conc = esys_ref.molar_conc
+    # gamma = esys_ref.gamma #[:i_max]
+    specie_names = List()
+    for s in esys_ref.species:
+        specie_names.append(s.name)
+    # specie_names = specie_names[0:i_max]
+
+    esys_ref.ionic_strength = esys_ref.get_I()
+    esys_ref.pH = esys_ref.get_pH()
+    esys_ref.sc = get_sc_non_jitted(esys_ref)
+    dic = esys_ref.calc_DIC()
+    SI, IAP, solids_names, precipitation_molalities, logKsps = calc_SI_and_IAP_precipitation_non_jitted(esys_ref)
+
+    x = np.array([
+        sp.logc
+        for i, sp in enumerate(esys_ref.species) if i < esys_ref.idx_control.idx['size']
+    ])
+
+    sat_index = Dict()
+    iap = Dict()
+    precip_conc = Dict()
+    logKsps_dict = Dict()
+    for i, name in enumerate(solids_names):
+        sat_index[name] = SI[i]
+        iap[name] = IAP[i]
+        precip_conc[name] = precipitation_molalities[i]
+        logKsps_dict[name] = logKsps[i]
+    # sat_index = {name: SI[i] for i, name in enumerate(solids_names)}
+    # iap = {name: IAP[i] for i, name in enumerate(solids_names)}
+    # precip_conc = {name: precipitation_molalities[i] for i, name in enumerate(solids_names)}
+    return SolutionResult(esys_ref.molar_conc, esys_ref.gamma, esys_ref.pH,
+        esys_ref.ionic_strength, esys_ref.sc, dic,
+        solids_names, specie_names, sat_index, precip_conc,
+        iap, logKsps_dict, esys_ref.idx_control.idx,
+        esys_ref.reactionsStorage, esys_ref.index_solubility_calculation, x, successfull)

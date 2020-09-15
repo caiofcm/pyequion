@@ -1,3 +1,6 @@
+__doc__ = """
+    Symbolic calculation for code generation and automatic jacobian computation.
+"""
 import sympy
 import pyequion
 import numpy
