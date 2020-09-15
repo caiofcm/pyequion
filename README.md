@@ -2,8 +2,6 @@
 
 A pure python implementation for electrolytes chemical equilibrium.
 
-NIDF Scaling Group Project
-
 A simplified version is provided with a web based user interface: https://caiofcm.github.io/pyequion-onl/
 
 ## Features

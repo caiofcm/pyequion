@@ -8,14 +8,17 @@ This sample was based on the daetools's  tutorial: `tutorial_adv_2.py`
 """
 
 import sys
+import os
 from time import localtime, strftime
 
 import numpy as np
 from daetools.pyDAE import *
 from daetools.solvers.trilinos import pyTrilinos
 from res_nahco3_cacl2_reduced_T_2 import res as res_speciation
+from res_nahco3_cacl2_T_2 import res as res_speciation
 import pyequion
 import aux_create_dynsim
+import daetools_cm
 
 # import pyequion
 # Standard variable types are defined in variable_types.py
@@ -23,25 +26,25 @@ from pyUnits import J, K, g, kg, kmol, m, mol, s, um
 
 no_small_positive_t = daeVariableType("no_small_positive_t", dimless, 0.0, 1.0,  0.1, 1e-5)
 
-# eq_idx_regular = {
-#     'size': 14,
-#     'Na+': 0,
-#     'HCO3-': 1,
-#     'Ca++': 2,
-#     'OH-': 3,
-#     'H+': 4,
-#     'CO2': 5,
-#     'CaOH+': 6,
-#     'NaOH': 7,
-#     'NaHCO3': 8,
-#     'CO3--': 9,
-#     'CaCO3': 10,
-#     'NaCO3-': 11,
-#     'Na2CO3': 12,
-#     'CaHCO3+': 13,
-#     'H2O': 14,
-#     'Cl-': 15,
-# }
+eq_idx_regular = {
+    'size': 14,
+    'Na+': 0,
+    'HCO3-': 1,
+    'Ca++': 2,
+    'OH-': 3,
+    'H+': 4,
+    'CO2': 5,
+    'CaOH+': 6,
+    'NaOH': 7,
+    'NaHCO3': 8,
+    'CO3--': 9,
+    'CaCO3': 10,
+    'NaCO3-': 11,
+    'Na2CO3': 12,
+    'CaHCO3+': 13,
+    'H2O': 14,
+    'Cl-': 15,
+}
 eq_idx_reduced2 = {
     'size': 11, #REDUCEC
     'Na+': 0,
@@ -58,7 +61,8 @@ eq_idx_reduced2 = {
     'H2O': 11,
     'Cl-': 12
 }
-eq_idx = eq_idx_reduced2
+# eq_idx = eq_idx_reduced2
+eq_idx = eq_idx_regular
 iNa = 0
 iC = 1
 iCa = 2
@@ -140,6 +144,8 @@ class modelCaCO3Precip(daeModel):
         self.aCO3mm = daeVariable("aCO3mm", no_t, self, "CO3-- Activity")
         self.pH = daeVariable("pH", no_t, self, "pH")
         self.massConcCrystalBulk = daeVariable("massConcCrystalBulk", no_t, self, "massConcCrystalBulk")
+        self.L10 = daeVariable("L10", no_t, self, "L10")
+        self.TK = daeVariable("TK", no_t, self, "T")
 
     def DeclareEquations(self):
         daeModel.DeclareEquations(self)
@@ -157,13 +163,13 @@ class modelCaCO3Precip(daeModel):
         # mu_refs = [mu0_ref*kappa**k for k in range(0,4)]
 
         "Element Conservation"
-
+        rhoc_mol = rhoc / (MW_CaCO3*1e-3) #kg/m^3 -> mol/m^3
         for j in range(0, n_elements):
             eq = self.CreateEquation("EleConservation({})".format(j), "")
             mu2_dim = self.mus(2) * mu0_ref * kappa**2
             G_dim = self.G() * kappa
             eq.Residual = dt(C[j]) - (
-                -3.0*f_cryst_mol[j]*kv*rhoc*mu2_dim*G_dim
+                -3.0*f_cryst_mol[j]*kv*rhoc_mol*mu2_dim*G_dim
             )
             eq.CheckUnitsConsistency = False
 
@@ -195,10 +201,14 @@ class modelCaCO3Precip(daeModel):
         # eq.Residual = self.G() - calc_G(S)
         eq.Residual = self.G() - (calc_G(S) / kappa)
 
+        # "Temperature"
+
+        # eq = self.CreateEquation("TK", "")
+        # eq.Residual = self.TK() - (25.0 + 273.15)
+
         "Chemical Speciation"
 
-        T = 25.0 + 273.15 #K
-        args_speciation = ([cNa, cC, cCa, cCl], T, np.nan)
+        args_speciation = ([cNa, cC, cCa, cCl], self.TK(), np.nan)
 
         x = [self.x_species(j) for j in range(n_species)]
         res_species = res_speciation(x, args_speciation)
@@ -242,6 +252,18 @@ class modelCaCO3Precip(daeModel):
         eq = self.CreateEquation("massConcCrystlBulk", "")
         eq.Residual = self.massConcCrystalBulk() - (self.mus(3)*kappa**3*mu0_ref) * rhoc * kv
 
+        eq = self.CreateEquation("L10", "")
+        eq.Residual = self.L10() - (self.mus(1)*kappa)/(self.mus(0)+1e-20)
+
+        "Disturbing Temperature"
+        self.IF(Time() < Constant(10*600*s), eventTolerance = 1E-5)
+        eq = self.CreateEquation("TKIni", "")
+        eq.Residual = self.TK() - (25.0 + 273.15)
+        self.ELSE()
+        eq = self.CreateEquation("TKMod", "")
+        eq.Residual = self.TK() - (50.0 + 273.15)
+        self.END_IF()
+
         pass
 
 class simTutorial(daeSimulation):
@@ -275,6 +297,7 @@ class simTutorial(daeSimulation):
         self.m.aCapp.SetInitialGuess(guess_aCapp)
         self.m.aCO3mm.SetInitialGuess(guess_aCO3mm)
         self.m.S.SetInitialGuess(S)
+        self.m.TK.SetInitialGuess(25.0 + 273.15)
 
         pass
 
@@ -285,12 +308,13 @@ def run(**kwargs):
     lasolver = pyTrilinos.daeCreateTrilinosSolver("Amesos_Umfpack", "")
     # lasolver = pyTrilinos.daeCreateTrilinosSolver("Amesos_Lapack", "")
     # lasolver = pyTrilinos.daeCreateTrilinosSolver("'AztecOO_ML", "")
-    return daeActivity.simulate(simulation, reportingInterval = 60,
+    return daeActivity.simulate(simulation, reportingInterval = 1,
                                             timeHorizon       = 20*60,
                                             lasolver          = lasolver,
                                             **kwargs)
 
 if __name__ == "__main__":
+
     guiRun = False if (len(sys.argv) > 1 and sys.argv[1] == 'console') else True
     # run(guiRun = guiRun)
     run(guiRun = False)

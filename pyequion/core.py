@@ -1181,7 +1181,7 @@ def save_res_to_file(sys_eq, loc_path, fun_name, fixed_temperature=None,
     activities_db_file_name=None,
     activity_model_type=act.TypeActivityCalculation.DEBYE,
     use_numpy=True, include_imports=True,
-    numbafy=True):
+    numbafy=False):
     """Save residual function to file
 
     Parameters

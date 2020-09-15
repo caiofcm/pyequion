@@ -1,5 +1,8 @@
-import pyequion
 
+import os
+import pyequion
+import daetools_cm
+from matplotlib import pyplot as plt
 
 sys_reactions_simpler = [
     {
@@ -111,9 +114,9 @@ def main_create_nahco3_cacl2_closed_sys():
 
     pyequion.display_reactions(sys_eq)
 
-    SAVE_RES = False
+    SAVE_RES = True
     if SAVE_RES:
-        pyequion.save_res_to_file(sys_eq, './res_nahco3_cacl2_reduced_T_2.py', 'res', numbafy=False)
+        pyequion.save_res_to_file(sys_eq, './res_nahco3_cacl2_T_2.py', 'res', numbafy=False)
     return sys_eq
 
 def get_caco3_nahco3_equilibrium():
@@ -124,10 +127,52 @@ def get_caco3_nahco3_equilibrium():
 
     sys_eq = pyequion.create_equilibrium(feed_compounds,
         fixed_elements=fixed_elements,
-        possible_aqueous_reactions_in=sys_reactions_simpler,
+        # possible_aqueous_reactions_in=sys_reactions_simpler,
     )
     return sys_eq
 
+def gen_plot_for_paper():
+    file_csv = 'out_dyn_calcite_precip_2.csv'
+    basedir = os.path.dirname(__file__)
+    f_path = os.path.join(basedir, file_csv)
+    df_out = daetools_cm.load_csv_daeplotter_many_vars(f_path)
+    print(df_out.info())
+    recolumns = ['pH', 'S', 'massCrystConc', 'L10']
+    df_out.columns = recolumns
+
+    # plt.figure()
+    fig, axs = plt.subplots(4, sharex=True, sharey=False, gridspec_kw={'hspace': 0})
+    axs[0].plot(df_out.index, df_out['pH'], 'k', lw=2)
+    axs[0].set_ylabel('pH', fontsize=12)
+    axs[1].plot(df_out.index, df_out['S'], 'k', lw=2)
+    axs[1].set_ylabel('S', fontsize=12)
+    mCrystg_mL = df_out['massCrystConc'] *1e6 #kg/kgW -> g/mL
+    axs[2].plot(df_out.index, mCrystg_mL, 'k', lw=2)
+    axs[2].set_ylabel('$C_{cryst}$ [g/mL]', fontsize=12)
+    L10_um = df_out['L10'] * 1e6 #m -> um
+    axs[3].plot(df_out.index, L10_um, 'k', lw=2)
+    axs[3].set_ylabel('$L_{10}$ [$\mu$m]', fontsize=12)
+    axs[3].set_xlabel('time [s]')
+
+
+    plt.savefig(os.path.join(basedir,'dyn_sim_with_pyequion.pdf'), bbox_extra_artists=None, bbox_inches='tight')
+
+    plt.show()
+
+    return
+
+def for_paper_code():
+
+    sys_eq = pyequion.create_equilibrium(
+        ['Na+', 'HCO3-', 'Ca++', 'Cl-'],
+        fixed_elements=['Cl-'],
+        possible_aqueous_reactions_in=sys_reactions_simpler,
+    )
+    pyequion.save_res_to_file(sys_eq, './eq_nahco3_caco3.py', 'res')
+
+
+    return
 
 if __name__ == "__main__":
-    main_create_nahco3_cacl2_closed_sys()
+    # main_create_nahco3_cacl2_closed_sys()
+    gen_plot_for_paper()

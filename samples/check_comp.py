@@ -1,4 +1,7 @@
-import numpy as np
+"""Pyequion sample
+
+- Simple usage
+"""
 import pyequion
 
 sol = pyequion.solve_solution(

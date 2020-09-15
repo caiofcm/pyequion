@@ -1,7 +1,16 @@
+"""
+Pyequion example
+
+Using a user provided function for activity coefficient calculation.
+"""
+# pylint: disable=invalid-name
 import os
-os.environ['NUMBA_DISABLE_JIT'] = '1'
-import pyequion
+
 import numpy as np
+
+import pyequion
+
+os.environ['NUMBA_DISABLE_JIT'] = '1'
 
 
 bromleyDB = {
@@ -11,12 +20,13 @@ bromleyDB = {
 }
 
 def bromley_model_ion(I, Bi_j, zi, zj, mj):
-    TK=25.0+273.15
+    "Bromley gamma model"
+    TK = 25.0+273.15
     A, _ = pyequion.activity_coefficients.debye_huckel_constant(TK)
 
     e = 4.8029e-10 #erg
     k = 1.38045e-16 #erg
-    Na =  6.02214076e23
+    Na = 6.02214076e23
     d0 = pyequion.properties_utils.density_water(TK)
     D = pyequion.properties_utils.dieletricconstant_water(TK)
     A = 1/2.303*(e/np.sqrt(D*k*TK))**3 * np.sqrt(2*np.pi*d0*Na/1000.0)
@@ -34,6 +44,7 @@ def bromley_model_ion(I, Bi_j, zi, zj, mj):
     return loggi
 
 def setup_bromley_single_electrlyt(reaction_sys, T, db_species, c_feed):
+    "Setup bromley single electrolyte"
     anions = [sp for sp in reaction_sys.species if sp.z < 0]
     cations = [sp for sp in reaction_sys.species if sp.z > 0]
     for c in cations:
@@ -42,9 +53,9 @@ def setup_bromley_single_electrlyt(reaction_sys, T, db_species, c_feed):
                 c.p_scalar[a.name] = bromleyDB[c.name][a.name]
             except KeyError:
                 c.p_scalar[a.name] = 0.0
-    return
 
 def calc_bromley_single_electrlyt(idx_ctrl, species, I, T):
+    "Calc bromley method for single electrolyte"
     anions = [sp for sp in species if sp.z < 0]
     cations = [sp for sp in species if sp.z > 0]
 

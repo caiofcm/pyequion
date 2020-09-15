@@ -1,3 +1,8 @@
+"""Pyequion sample
+
+- Calculating mean activity coefficients for CaCl2 and MgCl2
+"""
+
 #%% IMPORTS
 import os
 # os.environ['NUMBA_DISABLE_JIT'] = '1'
@@ -141,7 +146,7 @@ def main_check_jit():
             sys_eq,
             activity_model_type='debye',
         )
-        gamma_mean[i] = pyequion.get_mean_activity_coeff(solution, 'CaCl2')
+        gamma_mean[i] = pyequion.get_mean_activity_coeff(solution, 'CaCl2') #pylint: disable=unsupported-assignment-operation
     print('Elapsed time = ', time.time() - tstart)
     print(gamma_mean)
 
