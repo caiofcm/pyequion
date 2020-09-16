@@ -463,10 +463,10 @@ def print_solution(solution, conc_and_activity=False):
     "Print information of equilibrium solution results."
 
     print('Solution Results:')
-    print('\tpH = {:.5f}'.format(solution.pH))
-    print('\tsc = {:.5f}uS/cm'.format(solution.sc*1e6))
-    print('\tI = {:.5f}mmol/L'.format(solution.I*1e3))
-    print('\tDIC = {:.5f}mmol/L'.format(solution.DIC*1e3))
+    print('\tpH = {:.5f} '.format(solution.pH))
+    print('\tsc = {:.5f} uS/cm'.format(solution.sc*1e6))
+    print('\tI = {:.5f} mmol/L'.format(solution.I*1e3))
+    print('\tDIC = {:.5f} mmol/L'.format(solution.DIC*1e3))
     if solution.saturation_index:
         print('Saturation Index:')
         [print(f'\t{k}: {v}') for k, v in solution.saturation_index.items()]
