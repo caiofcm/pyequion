@@ -308,7 +308,24 @@ def cacl2_mgcl2_nacl_mean_activity_coeffs():
         plt.savefig(os.path.join(basedir, 'single-salt-meancoeffs.pgf'), bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.savefig(os.path.join(basedir, 'single-salt-meancoeffs.pdf'), bbox_extra_artists=(lgd,), bbox_inches='tight')
 
-
+    kw_save = dict(
+        CaCl2={
+            'exp': {'x': I_exp_cnvCaCl2, 'y': data_exp_raw_collected[:,1]},
+            'I_calcs': I_CaCl2,
+            'gamma_means': gamma_means_CaCl2,
+        },
+        MgCl2={
+            'exp': {'x': I_exp_cnvMgCl2, 'y': data_exp_raw_collected_mgcl2[:,1]},
+            'I_calcs': I_MgCl2,
+            'gamma_means': gamma_means_MgCl2,
+        },
+        NaCl={
+            'exp': {'x': I_exp_cnvNaCl, 'y': data_exp_raw_collected_NaCl[:,1]},
+            'I_calcs': I_NaCl,
+            'gamma_means': gamma_means_NaCl,
+        },
+    )
+    np.savez('single-salt-meancoeffs.npz', **kw_save)
     return
 
 
