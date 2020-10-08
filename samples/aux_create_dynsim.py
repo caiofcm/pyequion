@@ -155,6 +155,7 @@ def gen_plot_for_paper():
     axs[3].set_xlabel('time [s]')
 
 
+    df_out.to_csv('data-figure-5.csv')
     plt.savefig(os.path.join(basedir,'dyn_sim_with_pyequion.pdf'), bbox_extra_artists=None, bbox_inches='tight')
 
     plt.show()
