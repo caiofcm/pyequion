@@ -479,6 +479,8 @@ class SolutionResult():
         # }
         _concentrations = Dict()
         for k,v in zip(self.specie_names, self.c_molal):
+            if '(g)' in k:
+                continue
             _concentrations[k] = v
         self.concentrations = _concentrations
         self.x = x
