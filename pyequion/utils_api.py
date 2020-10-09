@@ -1,11 +1,11 @@
 
 # import commentjson as json
-import numba
 import numpy as np
 import json
 from . import core
 from . import pyequion
 from . import utils_for_numba
+import numba
 
 #####
 #####

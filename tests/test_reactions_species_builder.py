@@ -6,7 +6,6 @@ import pyequion
 from pyequion import reactions_species_builder as rbuilder
 from pyequion import ClosingEquationType
 from pyequion import symbolic_computations as mod_sym
-from pyequion import compilation
 # from xtest_pychemeq import assert_solution_result, compare_with_expected_perc_tuple
 from utils_tests import assert_solution_result, compare_with_expected_perc_tuple
 import numpy as np

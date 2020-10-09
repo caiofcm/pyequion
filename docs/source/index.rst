@@ -29,7 +29,7 @@ as the thermodynamic of electrolyte solutions is not stablished, specially for h
 Additionally, the models are semi-empirical relying on parameter databases, which may not be correctly adjusted for a given use case.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    license

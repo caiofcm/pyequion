@@ -4,24 +4,33 @@ import os
 import numpy as np
 from scipy import optimize
 
-from . import \
-    reactions_constants  # this is outdated, I am only using the logK_H ...
+# from . import \
+#     reactions_constants  # this is outdated, I am only using the logK_H ...
 from . import activity_coefficients, core
 from . import reactions_species_builder as rbuilder
-from . import utils, utils_api
+# from . import utils, utils_api #Check this! May break the server
+from . import utils
 from .activity_coefficients import (
     TypeActivityCalculation, calc_log_gamma_dh_bdot,
     calc_log_gamma_dh_bdot_mean_activity_neutral, calc_log_gamma_ideal,
     calc_log_gamma_pitzer, setup_log_gamma_bdot,
     setup_log_gamma_bdot_mean_activity_neutral, setup_log_gamma_ideal,
     setup_log_gamma_pitzer)
-from .core import (DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult,
-                   jit_compile_functions)
+from .core import (DEFAULT_DB_FILES, EquilibriumSystem, SolutionResult,)
+                #    jit_compile_functions)
 from .properties_utils import pCO2_ref, solve_with_exception
 from .reactions_species_builder import (display_reactions,
                                         ipython_display_reactions)
 from .utils import ClosingEquationType, get_dissociating_ions
-from .utils_for_numba import Dict, List
+from .utils_for_numba import Dict, List, HAS_NUMBA
+
+# if HAS_NUMBA:
+#     from .jit_helper import jit_compile_functions
+try:
+    from .jit_helper import jit_compile_functions
+except ImportError:
+    print('No numba installed.')
+    pass
 
 # from .core import save_jacobian_of_res_to_file, save_res_to_file
 
@@ -896,8 +905,7 @@ def get_sc_non_jitted(esys):
     cond_zero = np.zeros(len(esys.species))
     for i, sp in enumerate(esys.species):
         cond_zero[i] = sp.cond_molar
-    # cond_zero = np.array([conductivity_molar_zero[sp.idx_db] #FIXME conductivity parameters for species into db!!! PROGRAM BREAK!!
-    #                       for sp in self.species])
+
     return core.conductivity.solution_conductivity(I, gm, c, charges, cond_zero)
 
 def calculate_properties_non_jitted(esys_ref: EquilibriumSystem, successfull=True):

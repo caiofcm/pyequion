@@ -17,7 +17,7 @@ from .activity_coefficients import TypeActivityCalculation
 #     Dict = dict #parei aqui
 from .utils_for_numba import create_nb_Dict, create_nb_List
 from .core import DEFAULT_DB_FILES, Dict, List, SolutionResult
-from .properties_utils import Indexes_db, solve_with_exception, tags_db
+from .properties_utils import solve_with_exception
 from .utils import ClosingEquationType
 
 #--------------------------------------------
@@ -168,27 +168,18 @@ def create_equilibrium_from_reaction_and_species(reactions, species,
 
     "Possible Solid Formation: for S and IS calculation"
     _, solid_reactions = get_species_reactions_from_compounds(species, reactionsListPreciptationDB)
-    # solid_reactions_conv = convert_species_tags_for_reactions(solid_reactions)
     if len(solid_reactions) > 0:
         solid_reactions_ = create_list_of_reactions_engine(solid_reactions, engine_idxs.idx)
     else:
         solid_reactions_ = core.List()
         solid_reactions_.append(core.DUMMY_EqREACTION)
-        # solid_reactions_ = [core.DUMMY_EqREACTION]
-        # print('i am just a dummy reaction')
         logging.info('No solid phase detected.')
 
     # Database as dict to store the info:
     feed_compounds_List = create_nb_List(feed_compounds)
     element_mass_balance_List = create_nb_List(element_mass_balance)
-    # print('bef', initial_feed_mass_balance)
     initial_feed_mass_balance_List = create_nb_List(initial_feed_mass_balance)
-    # print('aft')
     fixed_elements_List = create_nb_List(fixed_elements)
-
-    # database_files_Dict = create_nb_Dict(database_files) #species as py file
-    # print('database_files_Dict')
-    # database_files_Dict = create_nb_Dict({'dummy': 'dummy'}) #species as py file
 
     reactionsStorage = numbafy_list_dict_str_float_reaction_storage(reactions)
     for item in reacs_irrev:
@@ -262,10 +253,8 @@ def fill_conductivity_in_species_from_db(species_engine, db_species):
 def get_fixed_specie_as_known_specie(fixed_elements, dict_indexes_species_conv, feed_compounds):
     known_species_constants = []
     for fixed_element in fixed_elements:
-        # idxs_in_feed.append([i for i, s in enumerate(feed_compounds) if fixed_element == s][0])
         idx_of_feed = [i for i, s in enumerate(feed_compounds) if fixed_element == s][0]
 
-        # ini_tag_mb_conv = convert_species_tag_for_engine([fixed_element])
         ini_known_idxs_mass_list = [dict_indexes_species_conv[fixed_element]]
 
         known_species_constants += [core.MassBalance(
@@ -278,30 +267,8 @@ def get_fixed_specie_as_known_specie(fixed_elements, dict_indexes_species_conv, 
     return known_species_constants
 
 def get_reactions_species_from_initial_configs(allow_precipitation, initial_comp, closing_equation_type, reactionList_):
-    # reactionList_ = list(reactionsListAqueous)
-    # if allow_precipitation:
-    #     reactionList_ += reactionsListPreciptation
 
     species, reactions = get_species_reactions_from_compounds(initial_comp, reactionList_)
-
-    # # Workaround for CO2(g) -> FIXME
-    # if closing_equation_type != ClosingEquationType.OPEN:
-    #     try:
-    #         species.remove('CO2(g)')
-    #     except KeyError:
-    #         pass
-    #     try:
-    #         idx_reacCO2 = [i
-    #         for i, reaction in enumerate(reactions)
-    #         if ('CO2' in reaction) and 'CO2(g)' in reaction][0]
-    #         reactions.pop(idx_reacCO2)
-    #     except IndexError:
-    #         pass
-
-    # # When encountered a solid, append its phase name (to distinguish from polymorphs)
-    # for sp in species:
-    #     if '(s)' in sp.name:
-    #         sp.name +=
 
     return reactions, species
 
@@ -403,13 +370,11 @@ def obtain_know_specie_list_from_feed(initial_feed_mass_balance, dict_indexes_sp
     return known_specie
 
 def get_idx_coef_from_species_tag_list(tags_coefs_carbone_total, dict_indexes_species_conv):
-    # tags_coefs_carbone_total_conv = convert_species_tag_for_engine(tags_coefs_carbone_total)
     species_indexes_carbone_total = np.array([dict_indexes_species_conv[tag] for tag in tags_coefs_carbone_total])
     species_coefs_carbone_total = np.array(list(tags_coefs_carbone_total.values()), dtype=np.float64)
     return species_indexes_carbone_total, species_coefs_carbone_total
 
 def get_species_reactions_from_compounds(compounds, reactionList=reactionsListAqueous):
-    # species = {c for c in compounds}
     species = OrderedSet([c for c in compounds])
     reactions = []
     for c in compounds:
@@ -419,13 +384,6 @@ def get_species_reactions_from_compounds(compounds, reactionList=reactionsListAq
 def are_others_in_side_of_reaction_kown(elements, species):
     tester = [e for e in elements if e in species]
     return len(tester) == len(elements)
-
-# def check_validity_specie_tag_in_reaction_dict(k):
-#     return (not (k == 'type' or \
-#         k == 'id_db' or \
-#         k == 'log_K25' or \
-#         k == 'log_K_coefs' or \
-#         k == 'phase_name'))
 
 def walk_in_species_reactions(c, species, reactions, reactionsList):
     for r in reactionsList:
@@ -473,13 +431,7 @@ def convert_species_tag_for_engine(species):
     return new
 
 def convert_species_tags_for_reactions(reactions_list):
-    # new_rections = [
-    #     {
-    #         replace_strings_for_engine_compatibility(k): v
-    #         for k, v in reac.items()
-    #         if check_validity_specie_tag_in_reaction_dict(k)
-    #     }
-    #     for reac in reactions_list]
+
     new_rections = []
     for reac in reactions_list:
         d = {}
@@ -545,10 +497,6 @@ def get_charge_of_specie(tag):
 def create_single_specie(tag):
     z = int(core.act.get_charge_of_specie(tag))
     phase = get_phase_from__species_tag(tag)
-    # I_factor, dh_a, dh_b = core.act.species_definition_dh_model(
-    #     tag, species_activity_db)
-
-        # else Will use davies
     return core.Specie(z, phase, tag)
 
 def get_phase_from__species_tag(tag):
@@ -567,7 +515,6 @@ def create_list_of_species_engine(species_tag): #, species_activity_db):
     for tag in species_tag:
         sp = create_single_specie(tag)
         species.append(sp)
-    # species = [create_single_specie(tag, species_activity_db) for tag in species_tag]
     return species
 
 def create_Indexes_instance(species_tag, known_specie_size=0):
@@ -575,11 +522,6 @@ def create_Indexes_instance(species_tag, known_specie_size=0):
 
     size = len(species_tag) - known_specie_size
     idx_ctrl = core.IndexController(species_tag, size)
-    # num_of_non_aqueous = core.get_species_that_are_not_aqueous(species_tag_conv)
-    # num_of_gaseous = core.get_count_of_gaseous(species_tag_conv)
-    # size = len(species_tag_conv) - num_of_gaseous - known_specie_size
-    # size = len(species_tag_conv) - known_specie_size
-    # idx = core.Indexes(idexes_species, size)
     return idx_ctrl
 
 def create_list_of_reactions_engine(reactions_list, dict_of_indexes_species):
@@ -596,10 +538,7 @@ def create_list_of_reactions_engine(reactions_list, dict_of_indexes_species):
                 # val = np.nan
                 val = -1
             reac_species_indexes += [val]
-        # reac_species_indexes = np.array([
-        #     dict_of_indexes_species[tag] for tag in reac_species
-        #         if tag in dict_of_indexes_species
-        # ])
+
         coefs = np.array([reac[k] for k in reac_species], dtype=np.float64)
 
         if not reac['log_K25']:
@@ -632,11 +571,6 @@ def create_list_of_reactions_engine(reactions_list, dict_of_indexes_species):
                 reac_species_indexes, coefs, logK25, log_coefs, reaction_type,
                 reac_species_List, delta_h)
         reactions.append(reac_new)
-        # reactions += [
-        #     core.EqReaction(
-        #         reac_species_indexes, coefs, logK25, log_coefs, reaction_type,
-        #         reac_species_List, delta_h), #FIXME-> type of reaction
-        # ]
 
     return reactions
 
@@ -668,16 +602,6 @@ def create_list_of_mass_balances_engine(list_species, element_list,
             # element_list = ele_set #ERROR When Using Al(OH)3 !!! Parenthesis
             logging.info(f'Element mass balances detectec: {element_list}')
 
-    # if not element_list and element_list != 'skip': #if not None or not [] #FIXME BIG TIME!!
-    #     logging.warning('''Element for mass balance is not defined. Defaulting to the first
-    #         element in each feed compound (this is only valid for monoatomic cations). ''')
-    #     # tags_no_signals = [re.sub(RX_NO_SIGNAL, '', tag) for tag in feed_list]
-    #     # list_elements_in_tags = [re.findall(RX_CASE, tag) for tag in tags_no_signals]
-    #     list_elements_in_tags = get_elements_and_their_coefs(feed_list)
-    #     element_list = OrderedSet([comp[0][0] for comp in list_elements_in_tags])
-
-    # if element_list == 'skip': element_list = [] #FIXME horrible!
-
     if not ele_set: #FIXME
         return None
 
@@ -692,8 +616,6 @@ def create_list_of_mass_balances_engine(list_species, element_list,
     if closing_equation_type in [ClosingEquationType.CARBON_TOTAL, ClosingEquationType.OPEN]:
         ele_set.discard('C') #Will be handle differently
 
-    # list_species_conv = convert_species_tag_for_engine(list_species)
-    # dict_of_indexes_species = get_dict_indexes_of_species_to_variable_position(list_species_conv)
     infos_el = []
     mass_balances = []
     for el in ele_set:
@@ -705,12 +627,7 @@ def create_list_of_mass_balances_engine(list_species, element_list,
         mass_balances += [
             core.MassBalance(species_indexes, species_coefs, i_c_feed, False)
         ]
-    # idx_new = [int(ii) for ii in species_indexes]
-    # mass_balances = core.MassBalance(
-    #     idx_new, #[idx.Nap, idx.NaCO3m, idx.NaOH, idx.NaHCO3, idx.Na2CO3],
-    #     infos_el[0][1],
-    #     infos_el[0][2], False
-    # )
+
     return mass_balances
 
 def get_species_indexes_matching_element(list_species, el, idx_species_dict):
@@ -737,15 +654,7 @@ def get_elements_and_their_coefs(list_of_species):
 
     elements_with_coefs = [separate_elements_coefs(item)
         for item in tags_no_signals]
-    # # Breaking up by letter case
-    # list_elements_in_tags = [re.findall(RX_CASE, tag) for tag in tags_no_signals]
-    # elements_with_coefs = [
-    #     [
-    #         (el[0:-1] if el[-1].isdigit() else el, el[-1] if el[-1].isdigit() else 1)
-    #         for el in list_el
-    #     ]
-    #     for list_el in list_elements_in_tags
-    # ]
+
     return elements_with_coefs
 
 def get_species_tags_with_an_element(list_of_species, element):
@@ -755,17 +664,14 @@ def get_species_tags_with_an_element(list_of_species, element):
     except ValueError:
         pass
     elements_with_coefs = tag_list_to_element_coef(elements)
-    # tag_el_for_balance = []
-    # coefs_el_for_balance = []
+
     tags_with_coefs = {}
     for els_coefs, tag in zip(elements_with_coefs, elements):
         for el_coef in els_coefs:
             el, coef = el_coef
             if el == element:
-                # tag_el_for_balance += [tag]
-                # coefs_el_for_balance += [coef]
                 tags_with_coefs[tag] = int(coef)
-    return tags_with_coefs#tag_el_for_balance, coefs_el_for_balance
+    return tags_with_coefs
 
 def get_indexes_feed_for_mass_balance(feeds: list, element: str):
     tags_with_coefs = get_species_tags_with_an_element(feeds, element)
@@ -775,26 +681,12 @@ def get_indexes_feed_for_mass_balance(feeds: list, element: str):
     feeds_coefs = [float(tags_with_coefs[feeds[idx]]) for idx in idxs_in_feed]
     return_as_list_of_tuple = [(i, c) for i, c in zip(idxs_in_feed, feeds_coefs)]
     return return_as_list_of_tuple
-    # return [tags_species.index(feed) for feed in feeds]
-
-# import numba
-# @numba.njit
-# def setup_log_gamma(species, TK, c_feed):
-
-#     print(len(species))
-#     return
-
 
 
 def setup_log_gamma(reaction_sys, T=25+298.15, c_feed=None,
         setup_func=None, db_activities=DEFAULT_DB_FILES['species']):
 
-    # if db_activities is None:
-    #     db_activities = DEFAULT_DB_FILES['species']
     species_activity_db = utils.load_from_db(db_activities)
-    # species_activity_db = species_activity_db['debye']
-    # else:
-        # species_activity_db = db_activities
 
     if setup_func is None:
         setup_func = core.act.setup_log_gamma_bdot

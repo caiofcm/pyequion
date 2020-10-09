@@ -1,5 +1,4 @@
 import commentjson as json
-import numba
 import numpy as np
 import json as json_base
 import copy
@@ -83,15 +82,4 @@ def load_from_db(fname):
     with open(fname, 'r') as json_file:
         db = json.load(json_file)
     return db
-
-@numba.njit()
-def initialize_dict_numbafied():
-    d_int = {'size': 0}
-    d_scalar = {'v': 0.0}
-    d_iarray = {'a': np.empty(1, dtype=np.int64)}
-    d_array = {'a': np.empty(1)}
-    d_matrix = {'m': np.empty((1,1))}
-    d_nested = {'n': {'i': np.empty((1))}}
-    d_string = {'n': 'H+'}
-    return d_int, d_scalar, d_iarray, d_array, d_matrix, d_nested, d_string
 

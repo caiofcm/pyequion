@@ -4,12 +4,11 @@ from . import utils
 from .utils_for_numba import List, Dict
 from pyequion import pitzer
 from .wateractivity import activitywater
-import numba
 import enum
 import numpy
 global np
 np = numpy
-from . import PengRobinson #WILL FAIL WITH NUMBA
+from . import PengRobinson #TODO Implement numbafied version
 
 # np = numpy
 
@@ -967,20 +966,6 @@ def species_definition_dh_model(tag, species_activity_db):
             print('Error getting activity of specie = {}'.format(tag))
             raise e
     return I_factor, dh_a, dh_b
-
-# @numba.njit
-# def ion_activity(I, TK, species, model_type=TypeActivityCalculation.DEBYE):
-#     if model_type == TypeActivityCalculation.DEBYE:
-#         return ion_activity_debye(I, TK, species)
-#     elif model_type == TypeActivityCalculation.IDEAL:
-#         loggamma = np.zeros(DB_SIZE)
-#         loggama_ret = [loggamma[sp.idx_db] for sp in species]
-#         return loggama_ret
-#     else:
-#         print('Unknown Activity Model')
-#         # raise ValueError('Unknown Activity Model')
-#         return [-1.0]
-
 
 # @numba.njit
 def debye_huckel_constant(TK):

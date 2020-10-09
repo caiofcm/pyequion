@@ -1,15 +1,19 @@
 import numpy as np
 from numpy import pi
-import numba
+try:
+    import numba
+    HAS_NUMBA = True
+except ImportError:
+    HAS_NUMBA = False
 
-@numba.njit
+# @numba.njit
 def ionicstr(m, z):
     # Função que calcula a força iônica I e o parâmetro Z
     ionic = 0.5 * np.sum(m*(z**2))
     zg = np.sum(np.abs(z)*m) #CHECK
     return ionic, zg
 
-@numba.njit
+# @numba.njit
 def afi(T):
     # Função que calcula o parâmetro de Debye-Huckel Afi
     # na = 6.023 * (10 ** 23)
@@ -43,7 +47,7 @@ def afi(T):
     #Aphi = 0.392 from G-A
     return Aphi
 
-@numba.njit
+# @numba.njit
 def funb(ionic, beta, zc, za):
     # Função que calcula o parâmetro B e a sua derivada a partir dos parâmetros ajustados beta
     isp = np.sqrt(ionic)
@@ -67,13 +71,13 @@ def funb(ionic, beta, zc, za):
     dbb = (1/ionic)*(par3 + par4)
     return bb, dbb
 
-@numba.njit
+# @numba.njit
 def func(cfi, zc, za):
     # Função que calcula o parâmetro C a partir do Cfi ajustável
     c = cfi/(2*(np.sqrt(abs(zc*za))))
     return c
 
-@numba.njit
+# @numba.njit
 def funphi(zc, zcc, ionic, a, theta):
 
     # Equações tiradas de George Anderson
@@ -151,7 +155,7 @@ def funphi(zc, zcc, ionic, a, theta):
 
     return phi, phil
 
-@numba.njit
+# @numba.njit
 def funf(mc, ma, ionic, a, dbb, dphic, dphia):
 
     # Os parâmetros dbb, dphic e dphia desta função é da interação entre todos os cátions e ânions,
@@ -186,7 +190,7 @@ def funf(mc, ma, ionic, a, dbb, dphic, dphia):
     f = par4 + par1 + par2 + par3
     return f
 
-@numba.njit
+# @numba.njit
 def loggammam(mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, psiMca, psiMaa,lambdanM, t, ic, skip_ternary=False):
 
     # (mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, psi1, psi2, psi3, psi4, lamb1, lamb2, t, ic, ia)
@@ -297,7 +301,7 @@ def loggammam(mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, psiMca, psiMaa,lamb
 
     return lngammam
 
-@numba.njit
+# @numba.njit
 def loggammax(mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, psiXac, psiXcc, lambdanX, t, ia, skip_ternary=False):
 
     # (mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, psi1, psi2, psi3, psi4, lamb1, lamb2, t, ic, ia)
@@ -412,7 +416,7 @@ def loggammax(mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, psiXac, psiXcc, lam
 
     return lngammax
 
-@numba.njit
+# @numba.njit
 def logneutro(mc, ma, lambdanc, lambdana, epnca, i_n, skip_ternary=True):
 
     termo1 = 0.0
@@ -435,7 +439,7 @@ def logneutro(mc, ma, lambdanc, lambdana, epnca, i_n, skip_ternary=True):
 
     return loggamman
 
-@numba.njit
+# @numba.njit
 def logmedio(lngammam, lngammax, zc, za):
 
     nua = zc
@@ -445,7 +449,7 @@ def logmedio(lngammam, lngammax, zc, za):
 
     return lnmx
 
-@numba.njit
+# @numba.njit
 def activitywater(mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, lambdanc, lambdana, t):
 
     z = np.concatenate((zc, za))
@@ -516,3 +520,22 @@ def activitywater(mc, ma, mn, zc, za, beta, cfi, thetac, thetaa, lambdanc, lambd
     lnactivity = -(18.0154/1000.0)*osmotic*soma
 
     return lnactivity
+
+
+#-------------------------------------------------
+#-------------------------------------------------
+#    Compiling IF Numba is present
+#-------------------------------------------------
+#-------------------------------------------------
+if HAS_NUMBA:
+    ionicstr = numba.njit()(ionicstr)
+    afi = numba.njit()(afi)
+    funb = numba.njit()(funb)
+    func = numba.njit()(func)
+    funphi = numba.njit()(funphi)
+    funf = numba.njit()(funf)
+    loggammam = numba.njit()(loggammam)
+    loggammax = numba.njit()(loggammax)
+    logneutro = numba.njit()(logneutro)
+    logmedio = numba.njit()(logmedio)
+    activitywater = numba.njit()(activitywater)
