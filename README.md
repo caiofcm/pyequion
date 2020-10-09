@@ -34,12 +34,6 @@ To create the test report:
 pytest --cov=pyequion ./tests/test_reactions_species_builder.py --cov-report=html
 ```
 
-## Visualization in PyEquIon Online
-
-- view at URL: https://caiofcm.github.io/pyequion-onl/
-- Dev-code: https://gitlab.com/caiofcm/pyequion-viewer
-- Deploy of backend API: https://gitlab.com/scaling-group/pyequion-distributed-gcp
-
 
 ## Helpers
 
