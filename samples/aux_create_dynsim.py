@@ -131,7 +131,7 @@ def get_caco3_nahco3_equilibrium():
     )
     return sys_eq
 
-def gen_plot_for_paper():
+def gen_plot_for_report():
     file_csv = 'out_dyn_calcite_precip_2.csv'
     basedir = os.path.dirname(__file__)
     f_path = os.path.join(basedir, file_csv)
@@ -162,7 +162,7 @@ def gen_plot_for_paper():
 
     return
 
-def for_paper_code():
+def for_report_code():
 
     sys_eq = pyequion.create_equilibrium(
         ['Na+', 'HCO3-', 'Ca++', 'Cl-'],
@@ -170,10 +170,8 @@ def for_paper_code():
         possible_aqueous_reactions_in=sys_reactions_simpler,
     )
     pyequion.save_res_to_file(sys_eq, './eq_nahco3_caco3.py', 'res')
-
-
     return
 
 if __name__ == "__main__":
     # main_create_nahco3_cacl2_closed_sys()
-    gen_plot_for_paper()
+    gen_plot_for_report()

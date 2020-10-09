@@ -14,11 +14,6 @@ Activity Coefficient
 .. automodule:: pyequion.activity_coefficients
    :members:
 
-Activity Coefficient
-======================================
-.. automodule:: pyequion.activity_coefficients
-   :members:
-
 General Utilities
 ======================================
 .. automodule:: pyequion.utils
