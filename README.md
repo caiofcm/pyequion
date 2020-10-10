@@ -46,6 +46,10 @@ The package can be installed with `pip install pyequion` or `pip install <folder
     >>    Vaterite: 1.5171786455013265
 ```
 
+## Documentation
+
+https://pyequion.readthedocs.io/en/latest/
+
 ## Running Tests
 
 To run unit tests:
