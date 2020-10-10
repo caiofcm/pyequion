@@ -1,5 +1,5 @@
 import os
-os.environ['NUMBA_DISABLE_JIT'] = '1' #WHAT A F... IS HAPPENING?
+os.environ['NUMBA_DISABLE_JIT'] = '1' #reconsider
 import pyequion
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
@@ -10,34 +10,13 @@ import json
 IS_LOCAL = False
 # Flask application - For local debugging
 if IS_LOCAL:
-    # import flask_profiler
-    # from werkzeug.contrib.profiler import ProfilerMiddleware
     from flask import Flask
     from flask_jsonrpc import JSONRPC
     from flask_cors import CORS
     from flask import request #TEST
     app = Flask(__name__)
-    # app.config["flask_profiler"] = {
-    #     "enabled": app.config["DEBUG"],
-    #     "storage": {
-    #         "engine": "sqlite"
-    #     },
-    #     "basicAuth":{
-    #         "enabled": True,
-    #         "username": "admin",
-    #         "password": "admin"
-    #     },
-    #     "ignore": [
-    #         "^/static/.*"
-    #     ]
-    #     }
+
     CORS(app)
-    # app.config["DEBUG"] = True
-    # app.config['PROFILE'] = True
-    # app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
-    #     restrictions=[30], sort_by=('cumtime',),
-    #     profile_dir='/home/caio/Projects/Carbonate/pyequion/api/'
-    # )
 
 """
 Testing:
@@ -260,17 +239,8 @@ def solve_equilibrium(sys_eq, concentrations, temperature, extraParameter, allow
         solResult_pyEq.reactions,
     )
 
-    # print(solResult)
-
-    # FIX THIS: Stupid way to remove NaN:
-    # as_json_str = simplejson.dumps(solResult.to_dict(), ignore_nan=True)
-    # back_to_dict = json.loads(as_json_str)
-    # return as_json_str
     return solResult#.to_dict()
 
-# @app.route('/hello')
-# def hello():
-#     return 'oi'
 
 def pyequion_api_local_flask():
     return pyequion_api(request)
@@ -279,7 +249,6 @@ if IS_LOCAL:
 
     app.route('/api', methods = ['POST'])(pyequion_api_local_flask)
 
-    # flask_profiler.init_app(app)
 
     if __name__ == '__main__':
         app.run(debug=True)
