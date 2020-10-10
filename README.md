@@ -9,6 +9,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pyequion/badge/?version=latest)](https://pyequion.readthedocs.io/en/latest/?badge=latest)
 [![PyPi Version](https://img.shields.io/pypi/v/pyequion)](https://pypi.org/project/pyequion)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/pyequion)](https://pypi.org/pypi/pyequion/)
+[![Coverage Status](https://coveralls.io/repos/github/caiofcm/pyequion/badge.svg?branch=master)](https://coveralls.io/github/caiofcm/pyequion?branch=master)
 
 # PyEquIon
 
