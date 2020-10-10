@@ -58,7 +58,7 @@ def setup_log_gamma_bdot(reaction_sys, T, db_species, c_feed=None):
     Fallback to:
 
     - Davies for charged species
-    - :math:`\log{\gamma} = 0.1I` for neutral species
+    - :math:`\\log{\\gamma} = 0.1I` for neutral species
 
     Parameters
     ----------
@@ -95,7 +95,7 @@ def calc_log_gamma_dh_bdot(
     Fallback to:
 
     - Davies for charged species
-    - :math:`\log{\gamma} = 0.1I` for neutral species
+    - :math:`\\log{\\gamma} = 0.1I` for neutral species
 
     Parameters
     ----------
@@ -142,7 +142,7 @@ def calc_log_gamma_dh_bdot_with_pengrobinson(
     Fallback to:
 
     - Davies for charged species
-    - :math:`\log{\gamma} = 0.1I` for neutral species
+    - :math:`\\log{\\gamma} = 0.1I` for neutral species
 
     Parameters
     ----------
@@ -203,7 +203,7 @@ def setup_log_gamma_bdot_mean_activity_neutral(
     Fallback to:
 
     - Davies for charged species
-    - :math:`\log{\gamma} = 0.1I` for neutral species
+    - :math:`\\log{\\gamma} = 0.1I` for neutral species
 
     Parameters
     ----------
