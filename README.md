@@ -28,6 +28,24 @@ A simplified version is provided with a web based user interface: https://caiofc
 
 The package can be installed with `pip install pyequion` or `pip install <folder>`
 
+## Basic Usage
+
+```python
+    import pyequion
+    sol = pyequion.solve_solution({'NaHCO3': 50, 'CaCl2': 10})
+    pyequion.print_solution(sol)
+    >> Solution Results:
+    >>    pH = 7.86640
+    >>    sc = 6602.68061 uS/cm
+    >>    I = 73.74077 mmol/L
+    >>    DIC = 50.00000 mmol/L
+    >> Saturation Index:
+    >>    Halite: -4.77905928064043
+    >>    Calcite: 2.083610139715626
+    >>    Aragonite: 1.9398402923233906
+    >>    Vaterite: 1.5171786455013265
+```
+
 ## Running Tests
 
 To run unit tests:
