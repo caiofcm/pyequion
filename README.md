@@ -6,6 +6,10 @@
   <p align="center">Aqueous equilibrium calculation.</p>
 </p>
 
+[![Documentation Status](https://readthedocs.org/projects/pyequion/badge/?version=latest)](https://pyequion.readthedocs.io/en/latest/?badge=latest)
+[![PyPi Version](https://img.shields.io/pypi/v/pyequion)](https://pypi.org/project/pyequion)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/pyequion)](https://pypi.org/pypi/pyequion/)
+
 # PyEquIon
 
 A pure python implementation for electrolytes chemical equilibrium.
