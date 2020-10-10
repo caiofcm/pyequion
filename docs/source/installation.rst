@@ -15,11 +15,14 @@ Dependencies
 List of main dependencies:
 
 * numpy
-* numba>=0.45
 * ordered-set
 * commentjson
 * scipy
 * sympy
+
+Additional functionality dependencies:
+
+* numba>=0.45
 
 Additional dependencies for sample cases:
 
