@@ -10,10 +10,10 @@ reactions_solutions = [
             -10576.913,
             -123.73158,
             0.0,
-            -6.996455e-05
+            -6.996455e-05,
         ],
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H2O": -2.0,
@@ -23,7 +23,7 @@ reactions_solutions = [
         "log_K25": -86.08,
         "log_K_coefs": "",
         "deltah": 134.79,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "H+": -2.0,
@@ -32,22 +32,16 @@ reactions_solutions = [
         "log_K25": -3.15,
         "log_K_coefs": "",
         "deltah": -1.759,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "CO3--": -1.0,
         "H+": -1.0,
         "HCO3-": 1.0,
         "log_K25": 10.329,
-        "log_K_coefs": [
-            107.8871,
-            0.03252849,
-            -5151.79,
-            -38.92561,
-            563713.9
-        ],
+        "log_K_coefs": [107.8871, 0.03252849, -5151.79, -38.92561, 563713.9],
         "deltah": -3.561,
-        "type": "rev"
+        "type": "rev",
     },
     # {
     #     "CO3--": -1.0,
@@ -71,15 +65,9 @@ reactions_solutions = [
         "CO2": -1.0,
         "H2O": -1.0,
         "log_K25": "",
-        "deltah": -5.738, #FIXME
-        "log_K_coefs": [
-            -356.3094,
-            -0.06091964,
-            21834.37,
-            126.8339,
-            -1684915
-        ],
-        "type": "rev"
+        "deltah": -5.738,  # FIXME
+        "log_K_coefs": [-356.3094, -0.06091964, 21834.37, 126.8339, -1684915],
+        "type": "rev",
     },
     {
         "CO3--": -1.0,
@@ -90,21 +78,16 @@ reactions_solutions = [
         "log_K25": 41.071,
         "log_K_coefs": "",
         "deltah": -61.039,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "SO4--": -1.0,
         "H+": -1.0,
         "HSO4-": 1.0,
         "log_K25": 1.988,
-        "log_K_coefs": [
-            -56.889,
-            0.006473,
-            2307.9,
-            19.8858
-        ],
+        "log_K_coefs": [-56.889, 0.006473, 2307.9, 19.8858],
         "deltah": 3.85,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "HS-": -1.0,
@@ -113,7 +96,7 @@ reactions_solutions = [
         "log_K25": -12.918,
         "log_K_coefs": "",
         "deltah": 12.1,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "SO4--": -1.0,
@@ -124,7 +107,7 @@ reactions_solutions = [
         "log_K25": 33.65,
         "log_K_coefs": "",
         "deltah": -60.14,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "HS-": -1.0,
@@ -133,7 +116,7 @@ reactions_solutions = [
         "log_K25": 6.994,
         "log_K_coefs": "",
         "deltah": -5.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H2Sg": -1.0,
@@ -142,7 +125,7 @@ reactions_solutions = [
         "log_K25": -6.994,
         "log_K_coefs": "",
         "deltah": 5.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "NO3-": -1.0,
@@ -153,7 +136,7 @@ reactions_solutions = [
         "log_K25": 28.57,
         "log_K_coefs": "",
         "deltah": -43.76,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "NO3-": -2.0,
@@ -164,7 +147,7 @@ reactions_solutions = [
         "log_K25": 207.08,
         "log_K_coefs": "",
         "deltah": -312.13,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "NO3-": -1.0,
@@ -175,20 +158,16 @@ reactions_solutions = [
         "log_K25": 119.077,
         "log_K_coefs": "",
         "deltah": -187.055,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "NH4+": -1.0,
         "NH3": 1.0,
         "H+": 1.0,
         "log_K25": -9.252,
-        "log_K_coefs": [
-            0.6322,
-            -0.001225,
-            -2835.76
-        ],
+        "log_K_coefs": [0.6322, -0.001225, -2835.76],
         "deltah": 12.48,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "NH4+": -1.0,
@@ -197,7 +176,7 @@ reactions_solutions = [
         "log_K25": 1.11,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H3BO3": -1.0,
@@ -206,7 +185,7 @@ reactions_solutions = [
         "log_K25": -9.24,
         "log_K_coefs": "",
         "deltah": 3.224,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H3BO3": -1.0,
@@ -215,7 +194,7 @@ reactions_solutions = [
         "log_K25": -0.4,
         "log_K_coefs": "",
         "deltah": 1.85,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H3BO3": -1.0,
@@ -226,7 +205,7 @@ reactions_solutions = [
         "log_K25": 7.63,
         "log_K_coefs": "",
         "deltah": 1.618,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H3BO3": -1.0,
@@ -237,7 +216,7 @@ reactions_solutions = [
         "log_K25": 13.67,
         "log_K_coefs": "",
         "deltah": -1.614,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H3BO3": -1.0,
@@ -248,7 +227,7 @@ reactions_solutions = [
         "log_K25": 20.28,
         "log_K_coefs": "",
         "deltah": -1.846,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "PO4---": -1.0,
@@ -257,7 +236,7 @@ reactions_solutions = [
         "log_K25": 12.346,
         "log_K_coefs": "",
         "deltah": -3.53,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "PO4---": -1.0,
@@ -266,7 +245,7 @@ reactions_solutions = [
         "log_K25": 19.553,
         "log_K_coefs": "",
         "deltah": -4.52,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "PO4---": -1.0,
@@ -275,20 +254,16 @@ reactions_solutions = [
         "log_K25": 21.721,
         "log_K_coefs": "",
         "deltah": -10.1,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H+": -1.0,
         "F-": -1.0,
         "HF": 1.0,
         "log_K25": 3.18,
-        "log_K_coefs": [
-            -2.033,
-            0.012645,
-            429.01
-        ],
+        "log_K_coefs": [-2.033, 0.012645, 429.01],
         "deltah": 3.18,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H+": -1.0,
@@ -297,7 +272,7 @@ reactions_solutions = [
         "log_K25": 3.76,
         "log_K_coefs": "",
         "deltah": 4.55,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
@@ -307,21 +282,16 @@ reactions_solutions = [
         "log_K25": -12.78,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
         "CO3--": -1.0,
         "CaCO3": 1.0,
         "log_K25": 3.224,
-        "log_K_coefs": [
-            -1228.732,
-            -0.29944,
-            35512.75,
-            485.818
-        ],
+        "log_K_coefs": [-1228.732, -0.29944, 35512.75, 485.818],
         "deltah": 3.545,
-        "type": "rev"
+        "type": "rev",
     },
     # {
     #     "Ca++": -1.0,
@@ -344,14 +314,9 @@ reactions_solutions = [
         "HCO3-": -1.0,
         "CaHCO3+": 1.0,
         "log_K25": "",
-        "log_K_coefs": [
-            1209.120,
-            0.31294,
-            -34765.05,
-            -478.782
-        ],
+        "log_K_coefs": [1209.120, 0.31294, -34765.05, -478.782],
         "deltah": -0.871,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
@@ -360,7 +325,7 @@ reactions_solutions = [
         "log_K25": 2.25,
         "log_K_coefs": "",
         "deltah": 1.325,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
@@ -369,7 +334,7 @@ reactions_solutions = [
         "log_K25": 1.08,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
@@ -378,7 +343,7 @@ reactions_solutions = [
         "log_K25": 6.459,
         "log_K_coefs": "",
         "deltah": 3.1,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
@@ -387,7 +352,7 @@ reactions_solutions = [
         "log_K25": 2.739,
         "log_K_coefs": "",
         "deltah": 3.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ca++": -1.0,
@@ -396,7 +361,7 @@ reactions_solutions = [
         "log_K25": 1.408,
         "log_K_coefs": "",
         "deltah": 3.4,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -406,19 +371,16 @@ reactions_solutions = [
         "log_K25": -11.44,
         "log_K_coefs": "",
         "deltah": 15.952,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
         "CO3--": -1.0,
         "MgCO3": 1.0,
         "log_K25": 2.98,
-        "log_K_coefs": [
-            0.991,
-            0.00667
-        ],
+        "log_K_coefs": [0.991, 0.00667],
         "deltah": 2.713,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -426,15 +388,9 @@ reactions_solutions = [
         "CO3--": -1.0,
         "MgHCO3+": 1.0,
         "log_K25": 11.399,
-        "log_K_coefs": [
-            48.6721,
-            0.03252849,
-            -2614.335,
-            -18.00263,
-            563713.9
-        ],
+        "log_K_coefs": [48.6721, 0.03252849, -2614.335, -18.00263, 563713.9],
         "deltah": -2.771,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -443,7 +399,7 @@ reactions_solutions = [
         "log_K25": 2.37,
         "log_K_coefs": "",
         "deltah": 4.55,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -452,7 +408,7 @@ reactions_solutions = [
         "log_K25": 6.589,
         "log_K_coefs": "",
         "deltah": 3.1,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -461,7 +417,7 @@ reactions_solutions = [
         "log_K25": 2.87,
         "log_K_coefs": "",
         "deltah": 3.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -470,7 +426,7 @@ reactions_solutions = [
         "log_K25": 1.513,
         "log_K_coefs": "",
         "deltah": 3.4,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mg++": -1.0,
@@ -479,7 +435,7 @@ reactions_solutions = [
         "log_K25": 1.82,
         "log_K_coefs": "",
         "deltah": 3.2,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -1.0,
@@ -489,7 +445,7 @@ reactions_solutions = [
         "log_K25": -14.18,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -1.0,
@@ -498,7 +454,7 @@ reactions_solutions = [
         "log_K25": 1.27,
         "log_K_coefs": "",
         "deltah": 8.91,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -1.0,
@@ -507,7 +463,7 @@ reactions_solutions = [
         "log_K25": -0.25,
         "log_K_coefs": "",
         "deltah": -1.0,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -2.0,
@@ -515,7 +471,7 @@ reactions_solutions = [
         "Na2CO3": 1.0,
         "log_K25": 0.672,
         "log_K_coefs": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -1.0,
@@ -524,7 +480,7 @@ reactions_solutions = [
         "log_K25": 0.7,
         "log_K_coefs": "",
         "deltah": 1.12,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -1.0,
@@ -533,7 +489,7 @@ reactions_solutions = [
         "log_K25": 0.29,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Na+": -1.0,
@@ -542,7 +498,7 @@ reactions_solutions = [
         "log_K25": -0.24,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "K+": -1.0,
@@ -551,7 +507,7 @@ reactions_solutions = [
         "log_K25": 0.85,
         "log_K_coefs": "",
         "deltah": 2.25,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "K+": -1.0,
@@ -560,7 +516,7 @@ reactions_solutions = [
         "log_K25": 0.29,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -570,7 +526,7 @@ reactions_solutions = [
         "log_K25": -9.5,
         "log_K_coefs": "",
         "deltah": 13.2,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -580,7 +536,7 @@ reactions_solutions = [
         "log_K25": -31.0,
         "log_K_coefs": "",
         "deltah": 30.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -589,7 +545,7 @@ reactions_solutions = [
         "log_K25": 0.14,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -598,7 +554,7 @@ reactions_solutions = [
         "log_K25": 4.38,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -607,7 +563,7 @@ reactions_solutions = [
         "log_K25": 2.0,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -616,7 +572,7 @@ reactions_solutions = [
         "log_K25": 2.25,
         "log_K_coefs": "",
         "deltah": 3.23,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -625,7 +581,7 @@ reactions_solutions = [
         "log_K25": 1.08,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -634,7 +590,7 @@ reactions_solutions = [
         "log_K25": 8.95,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -643,7 +599,7 @@ reactions_solutions = [
         "log_K25": 10.987,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -652,7 +608,7 @@ reactions_solutions = [
         "log_K25": 3.6,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -661,7 +617,7 @@ reactions_solutions = [
         "log_K25": 2.7,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -670,7 +626,7 @@ reactions_solutions = [
         "log_K25": 1.0,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -679,7 +635,7 @@ reactions_solutions = [
         "log_K25": -13.02,
         "log_K_coefs": "",
         "deltah": 9.68,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "Fe+++": -1.0,
@@ -689,7 +645,7 @@ reactions_solutions = [
         "log_K25": -2.19,
         "log_K_coefs": "",
         "deltah": 10.4,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -699,7 +655,7 @@ reactions_solutions = [
         "log_K25": -5.67,
         "log_K_coefs": "",
         "deltah": 17.1,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -709,7 +665,7 @@ reactions_solutions = [
         "log_K25": -12.56,
         "log_K_coefs": "",
         "deltah": 24.8,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -719,7 +675,7 @@ reactions_solutions = [
         "log_K25": -21.6,
         "log_K_coefs": "",
         "deltah": 31.9,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe++": -1.0,
@@ -729,7 +685,7 @@ reactions_solutions = [
         "log_K25": -20.57,
         "log_K_coefs": "",
         "deltah": 28.565,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -2.0,
@@ -739,7 +695,7 @@ reactions_solutions = [
         "log_K25": -2.95,
         "log_K_coefs": "",
         "deltah": 13.5,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -3.0,
@@ -749,7 +705,7 @@ reactions_solutions = [
         "log_K25": -6.3,
         "log_K_coefs": "",
         "deltah": 14.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -758,7 +714,7 @@ reactions_solutions = [
         "log_K25": 1.48,
         "log_K_coefs": "",
         "deltah": 5.6,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -767,7 +723,7 @@ reactions_solutions = [
         "log_K25": 2.13,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -776,7 +732,7 @@ reactions_solutions = [
         "log_K25": 1.13,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -785,7 +741,7 @@ reactions_solutions = [
         "log_K25": 4.04,
         "log_K_coefs": "",
         "deltah": 3.91,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -794,7 +750,7 @@ reactions_solutions = [
         "log_K25": 2.48,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -803,7 +759,7 @@ reactions_solutions = [
         "log_K25": 5.38,
         "log_K_coefs": "",
         "deltah": 4.6,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -812,7 +768,7 @@ reactions_solutions = [
         "log_K25": 5.43,
         "log_K_coefs": "",
         "deltah": 5.76,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -821,7 +777,7 @@ reactions_solutions = [
         "log_K25": 5.43,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -830,7 +786,7 @@ reactions_solutions = [
         "log_K25": 6.2,
         "log_K_coefs": "",
         "deltah": 2.7,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -839,7 +795,7 @@ reactions_solutions = [
         "log_K25": 10.8,
         "log_K_coefs": "",
         "deltah": 4.8,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Fe+++": -1.0,
@@ -848,7 +804,7 @@ reactions_solutions = [
         "log_K25": 14.0,
         "log_K_coefs": "",
         "deltah": 5.4,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -858,7 +814,7 @@ reactions_solutions = [
         "log_K25": -10.59,
         "log_K_coefs": "",
         "deltah": 14.4,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -868,7 +824,7 @@ reactions_solutions = [
         "log_K25": -34.8,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -877,7 +833,7 @@ reactions_solutions = [
         "log_K25": 0.61,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -886,7 +842,7 @@ reactions_solutions = [
         "log_K25": 0.25,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -895,7 +851,7 @@ reactions_solutions = [
         "log_K25": -0.31,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -904,7 +860,7 @@ reactions_solutions = [
         "log_K25": 4.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -913,7 +869,7 @@ reactions_solutions = [
         "log_K25": 1.95,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -922,7 +878,7 @@ reactions_solutions = [
         "log_K25": 2.25,
         "log_K_coefs": "",
         "deltah": 3.37,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -931,7 +887,7 @@ reactions_solutions = [
         "log_K25": 0.6,
         "log_K_coefs": "",
         "deltah": -0.396,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -940,7 +896,7 @@ reactions_solutions = [
         "log_K25": 0.84,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Mn++": -1.0,
@@ -949,7 +905,7 @@ reactions_solutions = [
         "log_K25": -25.51,
         "log_K_coefs": "",
         "deltah": 25.8,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "Al+++": -1.0,
@@ -957,14 +913,9 @@ reactions_solutions = [
         "AlOH++": 1.0,
         "H+": 1.0,
         "log_K25": -5.0,
-        "log_K_coefs": [
-            -38.253,
-            0.0,
-            -656.27,
-            14.327
-        ],
+        "log_K_coefs": [-38.253, 0.0, -656.27, 14.327],
         "deltah": 11.49,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -972,14 +923,9 @@ reactions_solutions = [
         "Al(OH)2+": 1.0,
         "H+": 2.0,
         "log_K25": -10.1,
-        "log_K_coefs": [
-            88.5,
-            0.0,
-            -9391.6,
-            -27.121
-        ],
+        "log_K_coefs": [88.5, 0.0, -9391.6, -27.121],
         "deltah": 26.9,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -987,14 +933,9 @@ reactions_solutions = [
         "Al(OH)3": 1.0,
         "H+": 3.0,
         "log_K25": -16.9,
-        "log_K_coefs": [
-            226.374,
-            0.0,
-            -18247.8,
-            -73.597
-        ],
+        "log_K_coefs": [226.374, 0.0, -18247.8, -73.597],
         "deltah": 39.89,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1002,14 +943,9 @@ reactions_solutions = [
         "Al(OH)4-": 1.0,
         "H+": 4.0,
         "log_K25": -22.7,
-        "log_K_coefs": [
-            51.578,
-            0.0,
-            -11168.9,
-            -14.865
-        ],
+        "log_K_coefs": [51.578, 0.0, -11168.9, -14.865],
         "deltah": 42.3,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1018,7 +954,7 @@ reactions_solutions = [
         "log_K25": 3.5,
         "log_K_coefs": "",
         "deltah": 2.29,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1027,7 +963,7 @@ reactions_solutions = [
         "log_K25": 5.0,
         "log_K_coefs": "",
         "deltah": 3.11,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1036,7 +972,7 @@ reactions_solutions = [
         "log_K25": 0.46,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1045,7 +981,7 @@ reactions_solutions = [
         "log_K25": 7.0,
         "log_K_coefs": "",
         "deltah": 1.06,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1054,7 +990,7 @@ reactions_solutions = [
         "log_K25": 12.7,
         "log_K_coefs": "",
         "deltah": 1.98,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1063,7 +999,7 @@ reactions_solutions = [
         "log_K25": 16.8,
         "log_K_coefs": "",
         "deltah": 2.16,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Al+++": -1.0,
@@ -1072,37 +1008,25 @@ reactions_solutions = [
         "log_K25": 19.4,
         "log_K_coefs": "",
         "deltah": 2.2,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H4SiO4": -1.0,
         "H3SiO4-": 1.0,
         "H+": 1.0,
         "log_K25": -9.83,
-        "log_K_coefs": [
-            -302.3724,
-            -0.050698,
-            15669.69,
-            108.18466,
-            -1119669.0
-        ],
+        "log_K_coefs": [-302.3724, -0.050698, 15669.69, 108.18466, -1119669.0],
         "deltah": 6.12,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H4SiO4": -1.0,
         "H2SiO4--": 1.0,
         "H+": 2.0,
         "log_K25": -23.0,
-        "log_K_coefs": [
-            -294.0184,
-            -0.07265,
-            11204.49,
-            108.18466,
-            -1119669.0
-        ],
+        "log_K_coefs": [-294.0184, -0.07265, 11204.49, 108.18466, -1119669.0],
         "deltah": 17.6,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "H4SiO4": -1.0,
@@ -1113,7 +1037,7 @@ reactions_solutions = [
         "log_K25": 30.18,
         "log_K_coefs": "",
         "deltah": -16.26,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ba++": -1.0,
@@ -1123,31 +1047,25 @@ reactions_solutions = [
         "log_K25": -13.47,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ba++": -1.0,
         "CO3--": -1.0,
         "BaCO3": 1.0,
         "log_K25": 2.71,
-        "log_K_coefs": [
-            0.113,
-            0.008721
-        ],
+        "log_K_coefs": [0.113, 0.008721],
         "deltah": 3.55,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ba++": -1.0,
         "HCO3-": -1.0,
         "BaHCO3+": 1.0,
         "log_K25": 0.982,
-        "log_K_coefs": [
-            -3.0938,
-            0.013669
-        ],
+        "log_K_coefs": [-3.0938, 0.013669],
         "deltah": 5.56,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Ba++": -1.0,
@@ -1156,7 +1074,7 @@ reactions_solutions = [
         "log_K25": 2.7,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Sr++": -1.0,
@@ -1166,7 +1084,7 @@ reactions_solutions = [
         "log_K25": -13.29,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Sr++": -1.0,
@@ -1174,27 +1092,18 @@ reactions_solutions = [
         "H+": -1.0,
         "SrHCO3+": 1.0,
         "log_K25": 11.509,
-        "log_K_coefs": [
-            104.6391,
-            0.04739549,
-            -5151.79,
-            -38.92561,
-            563713.9
-        ],
+        "log_K_coefs": [104.6391, 0.04739549, -5151.79, -38.92561, 563713.9],
         "deltah": 2.489,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Sr++": -1.0,
         "CO3--": -1.0,
         "SrCO3": 1.0,
         "log_K25": 2.81,
-        "log_K_coefs": [
-            -1.019,
-            0.012826
-        ],
+        "log_K_coefs": [-1.019, 0.012826],
         "deltah": 5.22,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Sr++": -1.0,
@@ -1203,7 +1112,7 @@ reactions_solutions = [
         "log_K25": 2.29,
         "log_K_coefs": "",
         "deltah": 2.08,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Li+": -1.0,
@@ -1212,7 +1121,7 @@ reactions_solutions = [
         "log_K25": 0.64,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1221,7 +1130,7 @@ reactions_solutions = [
         "log_K25": 2.72,
         "log_K_coefs": "",
         "deltah": 1.65,
-        "type": "electronic"
+        "type": "electronic",
     },
     {
         "Cu+": -1.0,
@@ -1230,7 +1139,7 @@ reactions_solutions = [
         "log_K25": 5.5,
         "log_K_coefs": "",
         "deltah": -0.42,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu+": -1.0,
@@ -1239,7 +1148,7 @@ reactions_solutions = [
         "log_K25": 5.7,
         "log_K_coefs": "",
         "deltah": 0.26,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1248,7 +1157,7 @@ reactions_solutions = [
         "log_K25": 6.73,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1257,7 +1166,7 @@ reactions_solutions = [
         "log_K25": 9.83,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1266,7 +1175,7 @@ reactions_solutions = [
         "log_K25": 2.7,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1275,7 +1184,7 @@ reactions_solutions = [
         "log_K25": 0.43,
         "log_K_coefs": "",
         "deltah": 8.65,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1284,7 +1193,7 @@ reactions_solutions = [
         "log_K25": 0.16,
         "log_K_coefs": "",
         "deltah": 10.56,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1293,7 +1202,7 @@ reactions_solutions = [
         "log_K25": -2.29,
         "log_K_coefs": "",
         "deltah": 13.69,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1302,7 +1211,7 @@ reactions_solutions = [
         "log_K25": -4.59,
         "log_K_coefs": "",
         "deltah": 17.78,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1311,7 +1220,7 @@ reactions_solutions = [
         "log_K25": 1.26,
         "log_K_coefs": "",
         "deltah": 1.62,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1321,7 +1230,7 @@ reactions_solutions = [
         "log_K25": -8.0,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1331,7 +1240,7 @@ reactions_solutions = [
         "log_K25": -13.68,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1341,7 +1250,7 @@ reactions_solutions = [
         "log_K25": -26.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1351,7 +1260,7 @@ reactions_solutions = [
         "log_K25": -39.6,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -2.0,
@@ -1361,7 +1270,7 @@ reactions_solutions = [
         "log_K25": -10.359,
         "log_K_coefs": "",
         "deltah": 17.539,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1370,7 +1279,7 @@ reactions_solutions = [
         "log_K25": 2.31,
         "log_K_coefs": "",
         "deltah": 1.22,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cu++": -1.0,
@@ -1379,7 +1288,7 @@ reactions_solutions = [
         "log_K25": 25.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1389,7 +1298,7 @@ reactions_solutions = [
         "log_K25": -8.96,
         "log_K_coefs": "",
         "deltah": 13.4,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1399,7 +1308,7 @@ reactions_solutions = [
         "log_K25": -16.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1409,7 +1318,7 @@ reactions_solutions = [
         "log_K25": -28.4,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1419,7 +1328,7 @@ reactions_solutions = [
         "log_K25": -41.2,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1428,7 +1337,7 @@ reactions_solutions = [
         "log_K25": 0.43,
         "log_K_coefs": "",
         "deltah": 7.79,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1437,7 +1346,7 @@ reactions_solutions = [
         "log_K25": 0.45,
         "log_K_coefs": "",
         "deltah": 8.5,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1446,7 +1355,7 @@ reactions_solutions = [
         "log_K25": 0.5,
         "log_K_coefs": "",
         "deltah": 9.56,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1455,7 +1364,7 @@ reactions_solutions = [
         "log_K25": 0.2,
         "log_K_coefs": "",
         "deltah": 10.96,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1466,7 +1375,7 @@ reactions_solutions = [
         "log_K25": -7.48,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1475,7 +1384,7 @@ reactions_solutions = [
         "log_K25": 14.94,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1484,7 +1393,7 @@ reactions_solutions = [
         "log_K25": 16.1,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1493,7 +1402,7 @@ reactions_solutions = [
         "log_K25": 5.3,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1502,7 +1411,7 @@ reactions_solutions = [
         "log_K25": 9.63,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1511,7 +1420,7 @@ reactions_solutions = [
         "log_K25": 2.1,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1520,7 +1429,7 @@ reactions_solutions = [
         "log_K25": 2.37,
         "log_K_coefs": "",
         "deltah": 1.36,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1529,7 +1438,7 @@ reactions_solutions = [
         "log_K25": 3.28,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1538,7 +1447,7 @@ reactions_solutions = [
         "log_K25": -0.58,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1547,7 +1456,7 @@ reactions_solutions = [
         "log_K25": -0.98,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Zn++": -1.0,
@@ -1556,7 +1465,7 @@ reactions_solutions = [
         "log_K25": 1.15,
         "log_K_coefs": "",
         "deltah": 2.22,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1566,7 +1475,7 @@ reactions_solutions = [
         "log_K25": -10.08,
         "log_K_coefs": "",
         "deltah": 13.1,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1576,7 +1485,7 @@ reactions_solutions = [
         "log_K25": -20.35,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1586,7 +1495,7 @@ reactions_solutions = [
         "log_K25": -33.3,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1596,7 +1505,7 @@ reactions_solutions = [
         "log_K25": -47.35,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -2.0,
@@ -1606,7 +1515,7 @@ reactions_solutions = [
         "log_K25": -9.39,
         "log_K_coefs": "",
         "deltah": 10.9,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1617,7 +1526,7 @@ reactions_solutions = [
         "log_K25": -7.404,
         "log_K_coefs": "",
         "deltah": 4.355,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1626,7 +1535,7 @@ reactions_solutions = [
         "log_K25": 0.4,
         "log_K_coefs": "",
         "deltah": -5.2,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1635,7 +1544,7 @@ reactions_solutions = [
         "log_K25": 1.98,
         "log_K_coefs": "",
         "deltah": 0.59,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1644,7 +1553,7 @@ reactions_solutions = [
         "log_K25": 2.6,
         "log_K_coefs": "",
         "deltah": 1.24,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1653,7 +1562,7 @@ reactions_solutions = [
         "log_K25": 2.4,
         "log_K_coefs": "",
         "deltah": 3.9,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1662,7 +1571,7 @@ reactions_solutions = [
         "log_K25": 2.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1671,7 +1580,7 @@ reactions_solutions = [
         "log_K25": 6.4,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1680,7 +1589,7 @@ reactions_solutions = [
         "log_K25": 1.5,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1689,7 +1598,7 @@ reactions_solutions = [
         "log_K25": 2.46,
         "log_K_coefs": "",
         "deltah": 1.08,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1698,7 +1607,7 @@ reactions_solutions = [
         "log_K25": 3.5,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1707,7 +1616,7 @@ reactions_solutions = [
         "log_K25": 2.17,
         "log_K_coefs": "",
         "deltah": -0.81,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1716,7 +1625,7 @@ reactions_solutions = [
         "log_K25": 2.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1725,7 +1634,7 @@ reactions_solutions = [
         "log_K25": 1.1,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1734,7 +1643,7 @@ reactions_solutions = [
         "log_K25": 1.5,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1743,7 +1652,7 @@ reactions_solutions = [
         "log_K25": 10.17,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1752,7 +1661,7 @@ reactions_solutions = [
         "log_K25": 16.53,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1761,7 +1670,7 @@ reactions_solutions = [
         "log_K25": 18.71,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Cd++": -1.0,
@@ -1770,7 +1679,7 @@ reactions_solutions = [
         "log_K25": 20.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1780,7 +1689,7 @@ reactions_solutions = [
         "log_K25": -7.71,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1790,7 +1699,7 @@ reactions_solutions = [
         "log_K25": -17.12,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1800,7 +1709,7 @@ reactions_solutions = [
         "log_K25": -28.06,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1810,7 +1719,7 @@ reactions_solutions = [
         "log_K25": -39.7,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -2.0,
@@ -1820,7 +1729,7 @@ reactions_solutions = [
         "log_K25": -6.36,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1829,7 +1738,7 @@ reactions_solutions = [
         "log_K25": 1.6,
         "log_K_coefs": "",
         "deltah": 4.38,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1838,7 +1747,7 @@ reactions_solutions = [
         "log_K25": 1.8,
         "log_K_coefs": "",
         "deltah": 1.08,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1847,7 +1756,7 @@ reactions_solutions = [
         "log_K25": 1.7,
         "log_K_coefs": "",
         "deltah": 2.17,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1856,7 +1765,7 @@ reactions_solutions = [
         "log_K25": 1.38,
         "log_K_coefs": "",
         "deltah": 3.53,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1865,7 +1774,7 @@ reactions_solutions = [
         "log_K25": 7.24,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1874,7 +1783,7 @@ reactions_solutions = [
         "log_K25": 10.64,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1883,7 +1792,7 @@ reactions_solutions = [
         "log_K25": 2.9,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1892,7 +1801,7 @@ reactions_solutions = [
         "log_K25": 2.75,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1901,7 +1810,7 @@ reactions_solutions = [
         "log_K25": 3.47,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1910,7 +1819,7 @@ reactions_solutions = [
         "log_K25": 15.27,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1919,7 +1828,7 @@ reactions_solutions = [
         "log_K25": 16.57,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -3.0,
@@ -1929,7 +1838,7 @@ reactions_solutions = [
         "log_K25": -23.88,
         "log_K_coefs": "",
         "deltah": 26.5,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1938,7 +1847,7 @@ reactions_solutions = [
         "log_K25": 1.17,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1947,7 +1856,7 @@ reactions_solutions = [
         "log_K25": 1.77,
         "log_K_coefs": "",
         "deltah": 2.88,
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1956,7 +1865,7 @@ reactions_solutions = [
         "log_K25": 1.44,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1965,7 +1874,7 @@ reactions_solutions = [
         "log_K25": 1.25,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1974,7 +1883,7 @@ reactions_solutions = [
         "log_K25": 2.56,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1983,7 +1892,7 @@ reactions_solutions = [
         "log_K25": 3.42,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
+        "type": "rev",
     },
     {
         "Pb++": -1.0,
@@ -1992,6 +1901,6 @@ reactions_solutions = [
         "log_K25": 3.1,
         "log_K_coefs": "",
         "deltah": "",
-        "type": "rev"
-    }
+        "type": "rev",
+    },
 ]

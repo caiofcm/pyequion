@@ -2,6 +2,7 @@ import numpy as np
 
 # Reference: http://www.aqion.de/site/194
 
+
 def solution_conductivity(I, gamma, conc_vals, charges, cond_molar_zero):
     """
     Solution non-ideal conductivity calculation
@@ -30,11 +31,10 @@ def solution_conductivity(I, gamma, conc_vals, charges, cond_molar_zero):
         if charges[i] == 0:
             continue
         if I < 0.36 * charges[i]:
-            alpha = 0.6 / np.sqrt(np.abs(charges[i])) #CHECKME
+            alpha = 0.6 / np.sqrt(np.abs(charges[i]))  # CHECKME
         else:
             alpha = np.sqrt(I) / charges[i]
-        aux = cond_molar_zero[i] * gamma[i]**alpha * conc_vals[i]
+        aux = cond_molar_zero[i] * gamma[i] ** alpha * conc_vals[i]
         ret += aux
     ret *= 1e-3
     return ret
-

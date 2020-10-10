@@ -6,11 +6,11 @@ HERE = pathlib.Path(__file__).parent
 
 # The text of the README file
 README = (HERE / "README.md").read_text()
-LICENSE = (HERE / "LICENSE.md")#.read_text()
+LICENSE = HERE / "LICENSE.md"  # .read_text()
 
 setup(
     name="pyequion",
-    version='0.0.5.1',
+    version="0.0.5.1",
     description="Chemical equilibrium for electrolytes in pure python",
     # packages=["pyequion"],
     url="https://github.com/caiofcm/pyequion",
@@ -19,19 +19,19 @@ setup(
     long_description_content_type="text/markdown",
     author="Caio Curitiba Marcellos",
     author_email="caiocuritiba@gmail.com",
-    license='BSD 3-Clause',
-    #license_file=LICENSE,
-    email='caiocuritiba@gmail.com',
+    license="BSD 3-Clause",
+    # license_file=LICENSE,
+    email="caiocuritiba@gmail.com",
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'numpy',
+        "numpy",
         # 'numba>=0.45',
         # 'numba',
-        'ordered-set',
-        'commentjson',
-        'scipy',
-        'sympy',
+        "ordered-set",
+        "commentjson",
+        "scipy",
+        "sympy",
     ],
     classifiers=[
         "Intended Audience :: Science/Research",

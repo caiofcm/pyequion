@@ -1,7 +1,9 @@
 import os
 import numpy as np
+
 try:
     import numba
+
     HAS_NUMBA = True
 except ImportError:
     HAS_NUMBA = False
@@ -9,30 +11,34 @@ except ImportError:
 List = list
 Dict = dict
 
+
 def set_list_type_for_jit():
     global List, Dict
     List = numba.typed.List
     Dict = numba.typed.Dict
     return
 
+
 def create_nb_List(py_list):
     nb_List = List()
 
     if not py_list:
         whatNew = List()
-        whatNew.append('a')
+        whatNew.append("a")
         whatNew.pop()
-        return whatNew #numba does not deal with None
+        return whatNew  # numba does not deal with None
 
     for val in py_list:
         nb_List.append(val)
     return nb_List
+
 
 def create_nb_Dict(py_dict):
     nb_Dict = Dict()
     for tag, val in py_dict.items():
         nb_Dict[tag] = val
     return nb_Dict
+
 
 # @numba.njit(cache=True)
 def root_finding_newton(fun, J, x, eps, max_iter, args):
@@ -43,25 +49,26 @@ def root_finding_newton(fun, J, x, eps, max_iter, args):
     until ||F|| < eps.
     """
     F_value = fun(x, args)
-    F_value_ = F_value.reshape((-1,1))
+    F_value_ = F_value.reshape((-1, 1))
     F_norm = np.linalg.norm(F_value, 2)  # l2 norm of vector
     iteration_counter = 0
     while abs(F_norm) > eps and iteration_counter < max_iter:
         delta = np.linalg.solve(J(x, args), -F_value_)
 
-        for i in range(x.size): #wtf numba!?!?!
-            x[i] += delta[i,0]
+        for i in range(x.size):  # wtf numba!?!?!
+            x[i] += delta[i, 0]
 
         F_value = fun(x, args)
-        F_value_ = F_value.reshape((-1,1))
+        F_value_ = F_value.reshape((-1, 1))
         F_norm = np.linalg.norm(F_value, 2)
         iteration_counter += 1
 
     # Here, either a solution is found, or too many iterations
     if abs(F_norm) > eps:
         iteration_counter = -1
-        raise ValueError('Maximum iteration reached in newton root finding!')
+        raise ValueError("Maximum iteration reached in newton root finding!")
     return x, iteration_counter
+
 
 # @numba.njit#(cache=True)
 def numeric_jacobian(fun, x, diff_eps, args):
@@ -76,6 +83,7 @@ def numeric_jacobian(fun, x, diff_eps, args):
         J[:, i] = (f1 - f2) / (2 * diff_eps)
 
     return J
+
 
 def create_jacobian(fun):
 
@@ -97,22 +105,23 @@ def root_finding_newton_previously(fun, J, x, eps, max_iter, args):
     until ||F|| < eps.
     """
     F_value = fun(x, args)
-    F_value_ = F_value.reshape((-1,1))
+    # F_value_ = F_value.reshape((-1, 1))
     F_norm = np.linalg.norm(F_value, 2)  # l2 norm of vector
     iteration_counter = 0
     while abs(F_norm) > eps and iteration_counter < max_iter:
         delta = np.linalg.solve(J(x, args), -F_value)
         x = x + delta
         F_value = fun(x, args)
-        F_value_ = F_value.reshape((-1,1))
+        # F_value_ = F_value.reshape((-1, 1))
         F_norm = np.linalg.norm(F_value, 2)
         iteration_counter += 1
 
     # Here, either a solution is found, or too many iterations
     if abs(F_norm) > eps:
         iteration_counter = -1
-        raise ValueError('Maximum iteration reached in newton root finding!')
+        raise ValueError("Maximum iteration reached in newton root finding!")
     return x, iteration_counter
+
 
 # # Testing:
 # @numba.njit(cache=True)
@@ -148,4 +157,6 @@ def root_finding_newton_previously(fun, J, x, eps, max_iter, args):
 if HAS_NUMBA:
     root_finding_newton = numba.njit(cache=True)(root_finding_newton)
     numeric_jacobian = numba.njit(cache=True)(numeric_jacobian)
-    root_finding_newton_previously = numba.njit(cache=True)(root_finding_newton_previously)
+    root_finding_newton_previously = numba.njit(cache=True)(
+        root_finding_newton_previously
+    )

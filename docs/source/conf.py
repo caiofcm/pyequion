@@ -3,7 +3,7 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
-master_doc = 'index'
+master_doc = "index"
 
 # -- Path setup --------------------------------------------------------------
 
@@ -13,15 +13,16 @@ master_doc = 'index'
 #
 import os
 import sys
-print('PATH', os.path.abspath('../../pyequion'))
-sys.path.insert(0, os.path.abspath('../../'))
+
+print("PATH", os.path.abspath("../../pyequion"))
+sys.path.insert(0, os.path.abspath("../../"))
 autodoc_mock_imports = ["numpy", "scipy", "sympy", "pyequion"]
 
 # -- Project information -----------------------------------------------------
 
-project = 'pyequion'
-copyright = '2019, c'
-author = 'c'
+project = "pyequion"
+copyright = "2019, c"
+author = "c"
 
 
 # -- General configuration ---------------------------------------------------
@@ -30,26 +31,28 @@ author = 'c'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.mathjax',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.todo",
+    "sphinx.ext.mathjax",
     # 'recommonmark'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-autodoc_member_order = 'bysource'
+autodoc_member_order = "bysource"
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

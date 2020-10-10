@@ -3,3 +3,4 @@ ordered-set
 commentjson
 scipy
 sympy
+pre-commit
