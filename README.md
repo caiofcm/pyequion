@@ -1,3 +1,11 @@
+
+<p align="center">
+  <a href="https://github.com/caiofcm/pyequion">
+    <img alt="pyequion" src="https://caiofcm.github.io/pyequion-onl/assets/pyequion_logo.png" width="100px">
+  </a>
+  <p align="center">Aqueous equilibrium calculation.</p>
+</p>
+
 # PyEquIon
 
 A pure python implementation for electrolytes chemical equilibrium.
