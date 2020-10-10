@@ -14,7 +14,7 @@ import os
 import sys
 print('PATH', os.path.abspath('../../pyequion'))
 sys.path.insert(0, os.path.abspath('../../'))
-
+autodoc_mock_imports = ["numpy", "scipy", "sympy", "pyequion"]
 
 # -- Project information -----------------------------------------------------
 
