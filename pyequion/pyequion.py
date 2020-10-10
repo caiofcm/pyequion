@@ -29,7 +29,7 @@ from .utils_for_numba import Dict, List, HAS_NUMBA
 try:
     from .jit_helper import jit_compile_functions
 except ImportError:
-    print('No numba installed.')
+    # print('Running No numba installed.')
     pass
 
 # from .core import save_jacobian_of_res_to_file, save_res_to_file

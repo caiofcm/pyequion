@@ -40,6 +40,13 @@ pytest --cov=pyequion ./tests/test_reactions_species_builder.py --cov-report=htm
 - Code can be JIT compiled with `numba` calling the function: `pyequion.jit_compile_functions()`
 - When using JIT, running the code in `jupyter` becomes unstable, prefer regular python script.
 
+## Contributors
+
+- Caio Curitiba Marcellos
+- Gerson Francisco da Silva Junior
+- Elvis do Amaral Soares
+- Fabio Ramos
+- Amaro G. Barreto Jr
 
 ## References:
 
