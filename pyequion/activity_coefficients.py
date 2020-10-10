@@ -460,532 +460,449 @@ def setup_log_gamma_pitzer(reaction_sys, T, db_species, c_feed=None):
     return
 
 
+# fmt: off
+
 # # @numba.njit
-# def calc_log_gamma_pitzer(idx_ctrl, species, I, T): #FIXME: idx_ctrl to reaction_sys ?
-#     """ Activity Coef. Calculation with Pitzer
+def calc_log_gamma_pitzer(idx_ctrl, species, I, T): #FIXME: idx_ctrl to reaction_sys ?
+    """ Activity Coef. Calculation with Pitzer
 
-#     - H2O as log mean
-#     - Non-neutral species such as CaOH+, CaHCO3+ are not treated from mean approach, but from the pitzer log cation/anion
+    - H2O as log mean
+    - Non-neutral species such as CaOH+, CaHCO3+ are not treated from mean approach, but from the pitzer log cation/anion
 
 
-#     Parameters
-#     ----------
-#     idx_ctrl : FIXME
-#         Auxilar structure for getting index of species
-#     species : list
-#         List of species
-#     I : float
-#         Ionic Strength
-#     T : float
-#         Temperature
-#     """
-#     sp0 = species[0]
-#     i_neutrals = sp0.p_iarray['i_neutrals']
-#     cations = [sp for sp in species if sp.z > 0]
-#     anions = [sp for sp in species if sp.z < 0]
-#     m_c = np.array([sp.logc for sp in cations])
-#     m_c = 10**m_c
-#     m_a = np.array([sp.logc for sp in anions])
-#     m_a = 10**m_a
-#     neutrals = [species[i] for i in i_neutrals]
-#     m_n = np.array([sp.logc for sp in neutrals])
-#     m_n = 10**m_n
-#     z_c = sp0.p_iarray['z_c']
-#     z_a = sp0.p_iarray['z_a']
-#     Lambda_c = sp0.p_matrix['Lambda_c']
-#     Lambda_a = sp0.p_matrix['Lambda_a']
-#     Theta_c = sp0.p_matrix['Theta_c']
-#     Theta_a = sp0.p_matrix['Theta_a']
-#     Cf = sp0.p_matrix['Cf']
-#     Beta = sp0.p_matrix['Beta']
+    Parameters
+    ----------
+    idx_ctrl : FIXME
+        Auxilar structure for getting index of species
+    species : list
+        List of species
+    I : float
+        Ionic Strength
+    T : float
+        Temperature
+    """
+    sp0 = species[0]
+    i_neutrals = sp0.p_iarray['i_neutrals']
+    cations = [sp for sp in species if sp.z > 0]
+    anions = [sp for sp in species if sp.z < 0]
+    m_c = np.array([sp.logc for sp in cations])
+    m_c = 10**m_c
+    m_a = np.array([sp.logc for sp in anions])
+    m_a = 10**m_a
+    neutrals = [species[i] for i in i_neutrals]
+    m_n = np.array([sp.logc for sp in neutrals])
+    m_n = 10**m_n
+    z_c = sp0.p_iarray['z_c']
+    z_a = sp0.p_iarray['z_a']
+    Lambda_c = sp0.p_matrix['Lambda_c']
+    Lambda_a = sp0.p_matrix['Lambda_a']
+    Theta_c = sp0.p_matrix['Theta_c']
+    Theta_a = sp0.p_matrix['Theta_a']
+    Cf = sp0.p_matrix['Cf']
+    Beta = sp0.p_matrix['Beta']
 
-#     skip_tern = True
-#     anan = np.array([np.nan])
-#     a2nan = np.array([[np.nan], [np.nan]])
-#     for i, sp in enumerate(cations):
-#         logg = pitzer.loggammam(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
-#             Theta_c, Theta_a, anan, anan, Lambda_c, T, i, skip_tern)/np.log(10)
-#         sp.set_log_gamma(logg)
+    skip_tern = True
+    anan = np.array([np.nan])
+    a2nan = np.array([[np.nan], [np.nan]])
+    for i, sp in enumerate(cations):
+        logg = pitzer.loggammam(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
+            Theta_c, Theta_a, anan, anan, Lambda_c, T, i, skip_tern)/np.log(10)
+        sp.set_log_gamma(logg)
 
-#     for i, sp in enumerate(anions):
-#         logg = pitzer.loggammax(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
-#             Theta_c, Theta_a, anan, anan, Lambda_a, T, i, skip_tern)/np.log(10)
-#         sp.set_log_gamma(logg)
+    for i, sp in enumerate(anions):
+        logg = pitzer.loggammax(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
+            Theta_c, Theta_a, anan, anan, Lambda_a, T, i, skip_tern)/np.log(10)
+        sp.set_log_gamma(logg)
 
-#     for i, sp in enumerate(neutrals): #FIXME: epnca-ternary-remove; why m_n not used?
-#         logg = pitzer.logneutro(m_c, m_a, Lambda_c, Lambda_a, a2nan, i, skip_tern)/np.log(10)
-#         sp.set_log_gamma(logg)
+    for i, sp in enumerate(neutrals): #FIXME: epnca-ternary-remove; why m_n not used?
+        logg = pitzer.logneutro(m_c, m_a, Lambda_c, Lambda_a, a2nan, i, skip_tern)/np.log(10)
+        sp.set_log_gamma(logg)
 
-#     # Mean Activity species:
-#     for sp in species:
-#         if not sp.p_int['use_mean_act']:
-#             continue
-#         aux = 0.0
-#         stoic_sum = 0.0
-#         for tag, stoic in sp.d['mean_coefs'].items():
-#             sp_ion = species[idx_ctrl.idx[tag]]
-#             aux += stoic[0]*sp_ion.logg
-#             stoic_sum += stoic[0]
-#         log_g_mean = aux / stoic_sum
-#         sp.set_log_gamma(log_g_mean)
+    # Mean Activity species:
+    for sp in species:
+        if not sp.p_int['use_mean_act']:
+            continue
+        aux = 0.0
+        stoic_sum = 0.0
+        for tag, stoic in sp.d['mean_coefs'].items():
+            sp_ion = species[idx_ctrl.idx[tag]]
+            aux += stoic[0]*sp_ion.logg
+            stoic_sum += stoic[0]
+        log_g_mean = aux / stoic_sum
+        sp.set_log_gamma(log_g_mean)
 
-#     spH2O = species[idx_ctrl.idx['H2O']]
-#     # sum_molal = np.array([10**sp.logc for sp in species if sp.name != 'H2O']).sum()
-#     ln_ac_water = pitzer.activitywater(m_c, m_a, m_n, z_c, z_a, Beta, Cf, Theta_c, Theta_a, Lambda_c, Lambda_a, T)
-#     logac_water = ln_ac_water/np.log(10)
-#     spH2O.set_log_gamma(logac_water)
+    spH2O = species[idx_ctrl.idx['H2O']]
+    # sum_molal = np.array([10**sp.logc for sp in species if sp.name != 'H2O']).sum()
+    ln_ac_water = pitzer.activitywater(m_c, m_a, m_n, z_c, z_a, Beta, Cf, Theta_c, Theta_a, Lambda_c, Lambda_a, T)
+    logac_water = ln_ac_water/np.log(10)
+    spH2O.set_log_gamma(logac_water)
 
-#     pass
+    pass
 
 # ## improve this!!!
 # ## equation of state inclusion is not good, get a better way
 
-# def calc_log_gamma_pitzer_pengrobinson(idx_ctrl, species, I, T): #FIXME: idx_ctrl to reaction_sys ?
-#     """ Activity Coef. Calculation with Pitzer
-
-#     - H2O as log mean
-#     - Non-neutral species such as CaOH+, CaHCO3+ are not treated from mean approach, but from the pitzer log cation/anion
-
-
-#     Parameters
-#     ----------
-#     idx_ctrl : FIXME
-#         Auxilar structure for getting index of species
-#     species : list
-#         List of species
-#     I : float
-#         Ionic Strength
-#     T : float
-#         Temperature
-#     """
-#     sp0 = species[0]
-#     i_neutrals = sp0.p_iarray['i_neutrals']
-#     cations = [sp for sp in species if sp.z > 0]
-#     anions = [sp for sp in species if sp.z < 0]
-#     m_c = np.array([sp.logc for sp in cations])
-#     m_c = 10**m_c
-#     m_a = np.array([sp.logc for sp in anions])
-#     m_a = 10**m_a
-#     neutrals = [species[i] for i in i_neutrals]
-#     m_n = np.array([sp.logc for sp in neutrals])
-#     m_n = 10**m_n
-#     z_c = sp0.p_iarray['z_c']
-#     z_a = sp0.p_iarray['z_a']
-#     Lambda_c = sp0.p_matrix['Lambda_c']
-#     Lambda_a = sp0.p_matrix['Lambda_a']
-#     Theta_c = sp0.p_matrix['Theta_c']
-#     Theta_a = sp0.p_matrix['Theta_a']
-#     Cf = sp0.p_matrix['Cf']
-#     Beta = sp0.p_matrix['Beta']
-
-#     skip_tern = True
-#     anan = np.array([np.nan])
-#     a2nan = np.array([[np.nan], [np.nan]])
-#     for i, sp in enumerate(cations):
-#         logg = pitzer.loggammam(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
-#             Theta_c, Theta_a, anan, anan, Lambda_c, T, i, skip_tern)/np.log(10)
-#         sp.set_log_gamma(logg)
-
-#     for i, sp in enumerate(anions):
-#         logg = pitzer.loggammax(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
-#             Theta_c, Theta_a, anan, anan, Lambda_a, T, i, skip_tern)/np.log(10)
-#         sp.set_log_gamma(logg)
-
-#     for i, sp in enumerate(neutrals): #FIXME: epnca-ternary-remove; why m_n not used?
-#         logg = pitzer.logneutro(m_c, m_a, Lambda_c, Lambda_a, a2nan, i, skip_tern)/np.log(10)
-#         sp.set_log_gamma(logg)
-
-#     # Mean Activity species:
-#     for sp in species:
-#         if not sp.p_int['use_mean_act']:
-#             continue
-#         aux = 0.0
-#         stoic_sum = 0.0
-#         for tag, stoic in sp.d['mean_coefs'].items():
-#             sp_ion = species[idx_ctrl.idx[tag]]
-#             aux += stoic[0]*sp_ion.logg
-#             stoic_sum += stoic[0]
-#         log_g_mean = aux / stoic_sum
-#         sp.set_log_gamma(log_g_mean)
-
-#     for sp in species:
-#         if '(g)' in sp.name: #gas phase
-#             pCO2 = sp.p_scalar['P']
-#             logfiCO2 = PengRobinson.fugacidade(T, pCO2)
-#             logfCO2 = np.log10(np.exp(logfiCO2)*pCO2)
-#             logg = logfCO2 #Is the log fugacity for gas...
-#             sp.set_log_gamma(logg)
-
-#     spH2O = species[idx_ctrl.idx['H2O']]
-#     # sum_molal = np.array([10**sp.logc for sp in species if sp.name != 'H2O']).sum()
-#     ln_ac_water = pitzer.activitywater(m_c, m_a, m_n, z_c, z_a, Beta, Cf, Theta_c, Theta_a, Lambda_c, Lambda_a, T)
-#     logac_water = ln_ac_water/np.log(10)
-#     spH2O.set_log_gamma(logac_water)
-
-#     pass
-
-# # -------------------------------
-# # Bromley Model
-# # -------------------------------
-
-# def setup_bromley_method_Binteration(reaction_sys, T, db_species, c_feed=None):
-#     """
-#     From interation B12 - Halted
-#     """
-#     anions = [sp for sp in reaction_sys.species if sp.z < 0]
-#     cations = [sp for sp in reaction_sys.species if sp.z > 0]
-#     for c in cations:
-#         for a in anions:
-#             try:
-#                 c.p_scalar[a.name] = db_species['bromley'][c.name][a.name]
-#             except KeyError:
-#                 c.p_scalar[a.name] = 0.0
-#     return
-
-# def setup_bromley_method_Bindividual(reaction_sys, T, db_species, c_feed=None):
-#     """
-#     From individual ions B values
-#     """
-#     db = db_species['bromley-individuals']
-#     anions = [sp for sp in reaction_sys.species if sp.z < 0]
-#     cations = [sp for sp in reaction_sys.species if sp.z > 0]
-#     for c in cations:
-#         for a in anions:
-#             try:
-#                 Bplus = db[c.name]['B']
-#                 Bminus = db[a.name]['B']
-#                 dplus = db[c.name]['d']
-#                 dminus = db[a.name]['d']
-#                 Bca = Bplus + Bminus + dplus*dminus
-#             except KeyError:
-#                 Bca = 0.0
-#             c.p_scalar[a.name] = Bca
-#     return
-
-# # @numba.njit
-# def bromley_model_ion(I, Bi_j, zi, zj, mj):
-#     TK=25.0+273.15
-#     A, _ = debye_huckel_constant(TK)
-
-#     e = 4.8029e-10 #erg
-#     k = 1.38045e-16 #erg
-#     Na =  6.02214076e23
-#     d0 = properties_utils.density_water(TK)
-#     D = properties_utils.dieletricconstant_water(TK)
-#     A = 1/2.303*(e/np.sqrt(D*k*TK))**3 * np.sqrt(2*np.pi*d0*Na/1000.0)
-
-#     sqI = np.sqrt(I)
-#     zz = np.abs(zi*zj)
-#     nBij = (0.06+0.6*Bi_j) * zz
-#     dBij = (1.0+(1.5/(zz))*I)**2
-#     dotBij = nBij/dBij + Bi_j
-#     Zij = (np.abs(zi) + np.abs(zj))/2.0
-#     Fi = np.sum(dotBij * Zij**2 * mj)
-
-
-#     loggi = -A*zi**2*sqI/(1.0+sqI) + Fi
-
-#     return loggi
-
-# # @numba.njit
-# def calc_bromley_method(idx_ctrl, species, I, T):
-#     anions = [sp for sp in species if sp.z < 0]
-#     cations = [sp for sp in species if sp.z > 0]
-
-#     for c in cations:
-#         Bi_j = np.array([c.p_scalar[a.name] for a in anions])
-#         z_j = np.array([a.z for a in anions])
-#         mj = np.power(10, np.array([a.logc for a in anions]))
-#         loggC = bromley_model_ion(I, Bi_j, c.z, z_j, mj)
-#         c.set_log_gamma(loggC)
-
-#     for a in anions:
-#         Bi_j = np.array([c.p_scalar[a.name] for c in cations])
-#         z_j = np.array([c.z for c in cations])
-#         mj = np.power(10, np.array([c.logc for c in cations]))
-#         loggA = bromley_model_ion(I, Bi_j, a.z, z_j, mj)
-#         a.set_log_gamma(loggA)
-
-#     #FIXME!!
-#     # species[idx_ctrl.idx['H2O']].set_log_gamma(-1.609437912)
-#     pass
-
-
-# # -------------------------------
-# # Specific Ion Interaction Theory (SIT) Model
-# # Same reference as PHREEQC:
-# # Grenthe et al_1997_Modelling in aquatic chemistry.pdf
-# # -------------------------------
-
-# def setup_SIT_model(reaction_sys, T, db_species, c_feed=None):
-#     """
-#     SIT Method as in Ref: Grenthe et al_1997_Modelling in aquatic chemistry.pdf
-#     """
-#     db_species = db_species['sit']
-#     species = reaction_sys.species
-#     all_eps_names = [sp.name for sp in species]
-
-#     # A, B = debye_huckel_constant(T)
-#     # idx_cntrl = reaction_sys.idx_control
-#     # idx_cntrl.s['A'] =  A
-#     # idx_cntrl.s['B'] =  B #I will not assume constant T for the setup, but is an option
-#     for sp_i in species:
-#         epslon_i = np.empty(len(species))
-#         for k, sp_name_k in enumerate(all_eps_names):
-#             try:
-#                 e_ik = db_species[sp_i.name][sp_name_k]
-#             except KeyError:
-#                 e_ik = 0.0
-#             epslon_i[k] = e_ik
-
-#         sp_i.p_array['eik'] = epslon_i
-#         # I_factor, dh_a, dh_b = species_definition_dh_model(sp.name, db_species)
-#         # sp.p_scalar['I_factor'] = I_factor
-#         # sp.p_scalar['dh_a'] = dh_a
-#         # sp.p_scalar['dh_b'] = dh_b
-#     return
-
-
-# # @numba.njit
-# # def sit_log_camma_calc(I, Bi_j, zi, zj, mj):
-# #     TK=25.0+273.15
-# #     A, _ = debye_huckel_constant(TK)
-
-# #     e = 4.8029e-10 #erg
-# #     k = 1.38045e-16 #erg
-# #     Na =  6.02214076e23
-# #     d0 = properties_utils.density_water(TK)
-# #     D = properties_utils.dieletricconstant_water(TK)
-# #     A = 1/2.303*(e/np.sqrt(D*k*TK))**3 * np.sqrt(2*np.pi*d0*Na/1000.0)
-
-# #     sqI = np.sqrt(I)
-# #     zz = np.abs(zi*zj)
-# #     nBij = (0.06+0.6*Bi_j) * zz
-# #     dBij = (1.0+(1.5/(zz))*I)**2
-# #     dotBij = nBij/dBij + Bi_j
-# #     Zij = (np.abs(zi) + np.abs(zj))/2.0
-# #     Fi = np.sum(dotBij * Zij**2 * mj)
-
-
-# #     loggi = -A*zi**2*sqI/(1.0+sqI) + Fi
-
-# #     return loggi
-
-# # @numba.njit
-# def calc_sit_method(idx_ctrl, species, I, T):
-#     A, _ = debye_huckel_constant(T)
-#     Ba = 1.5
-#     mj = np.power(10, np.array([sp.logc for sp in species]))  # DO NOT NEED TO BE CALCULATED FOR EACH SPECIES, FIXME
-#     for sp in species:
-#         eik = sp.p_array['eik']
-#         sum_interactions = eik @ mj
-#         logg = -A*sp.z**2*np.sqrt(I)/(1+Ba*np.sqrt(I)) + sum_interactions
-
-
-#         # if np.isfinite(sp.p_scalar['dh_a']):
-#         #     # Debye-Huckel Modified
-#         #     a = sp.p_scalar['dh_a']
-#         #     b = sp.p_scalar['dh_b']
-
-#         #     sum_interactions
-
-#         #     logg = -A*sp.z**2*np.sqrt(I)/(1+Ba*np.sqrt(I)) + sum_interactions
-#         # elif np.isfinite(sp.p_scalar['I_factor']):
-#         #     logg = sp.p_scalar['I_factor'] * I
-#         # else:
-#         #     # Davies
-#         #     logg = log10gamma_davies(I, sp.z, A)
-#         sp.set_log_gamma(logg)
-#     pass
-
-# # -------------------------------
-# # New Pitzer Implementation
-# # Equations from Implementing in Flowbat reference
-# # -------------------------------
-
-
-# # def setup_pitzer_method_new(reaction_sys, T, db_species, c_feed=None):
-# #     """
-# #     Setup for Pitzer method as reported in
-# #     """
-# #     db = db_species['pitzer']
-# #     anions = [sp for sp in reaction_sys.species if sp.z < 0]
-# #     cations = [sp for sp in reaction_sys.species if sp.z > 0]
-# #     for sp_i in reaction_sys.species:
-# #         for sp_j in reaction_sys.species:
-# #             pass
-
-# #     # for c in cations:
-# #     #     for a in anions:
-# #     #         try:
-# #     #             Bplus = db[c.name]['B']
-# #     #             Bminus = db[a.name]['B']
-# #     #             dplus = db[c.name]['d']
-# #     #             dminus = db[a.name]['d']
-# #     #             Bca = Bplus + Bminus + dplus*dminus
-# #     #         except KeyError:
-# #     #             Bca = 0.0
-# #     #         c.p_scalar[a.name] = Bca
-# #     return
-
-# # # @numba.njit
-# # # def bromley_model_ion(I, Bi_j, zi, zj, mj):
-# # #     TK=25.0+273.15
-# # #     A, _ = debye_huckel_constant(TK)
-
-# # #     e = 4.8029e-10 #erg
-# # #     k = 1.38045e-16 #erg
-# # #     Na =  6.02214076e23
-# # #     d0 = properties_utils.density_water(TK)
-# # #     D = properties_utils.dieletricconstant_water(TK)
-# # #     A = 1/2.303*(e/np.sqrt(D*k*TK))**3 * np.sqrt(2*np.pi*d0*Na/1000.0)
-
-# # #     sqI = np.sqrt(I)
-# # #     zz = np.abs(zi*zj)
-# # #     nBij = (0.06+0.6*Bi_j) * zz
-# # #     dBij = (1.0+(1.5/(zz))*I)**2
-# # #     dotBij = nBij/dBij + Bi_j
-# # #     Zij = (np.abs(zi) + np.abs(zj))/2.0
-# # #     Fi = np.sum(dotBij * Zij**2 * mj)
-
-
-# # #     loggi = -A*zi**2*sqI/(1.0+sqI) + Fi
-
-# # #     return loggi
-
-# # @numba.njit
-# # def calc_new_pitzer_method(idx_ctrl, species, I, T):
-# #     anions = [sp for sp in species if sp.z < 0]
-# #     cations = [sp for sp in species if sp.z > 0]
-# #     neutrals = [sp for sp in species if sp.z == 0]
-
-# #     for c in cations:
-# #         Bi_j = np.array([c.p_scalar[a.name] for a in anions])
-# #         z_j = np.array([a.z for a in anions])
-# #         mj = np.power(10, np.array([a.logc for a in anions]))
-# #         loggC = bromley_model_ion(I, Bi_j, c.z, z_j, mj)
-# #         c.set_log_gamma(loggC)
-
-# #     for a in anions:
-# #         Bi_j = np.array([c.p_scalar[a.name] for c in cations])
-# #         z_j = np.array([c.z for c in cations])
-# #         mj = np.power(10, np.array([c.logc for c in cations]))
-# #         loggA = bromley_model_ion(I, Bi_j, a.z, z_j, mj)
-# #         a.set_log_gamma(loggA)
-
-# #     #FIXME!!
-# #     # species[idx_ctrl.idx['H2O']].set_log_gamma(-1.609437912)
-# #     pass
-
-# # -------------------------------
-# # e-NRTL
-# # Chen
-# # title = {A local composition model for the excess {Gibbs} energy of aqueous electrolyte systems},
-# # -------------------------------
-
-# db_enrtl_debug = {
-#     'Na': {
-#         'tau': {'H2O': -4.5916,}
-#     },
-#     'H2O': {
-#         'tau': {'H2O': 9.0234,}
-#     }
-# }
-# def setup_eNRTL_model(reaction_sys, T, db_species, c_feed=None):
-#     """
-#     eNRTL Method Chen (1986)
-#     """
-#     db_species = db_enrtl_debug
-#     species = reaction_sys.species
-#     all_eps_names = [sp.name for sp in species]
-
-#     for sp_i in species:
-#         epslon_i = np.empty(len(species))
-#         for k, sp_name_k in enumerate(all_eps_names):
-#             try:
-#                 e_ik = db_species[sp_i.name][sp_name_k]
-#             except KeyError:
-#                 e_ik = 0.0
-#             epslon_i[k] = e_ik
-
-#         sp_i.p_array['eik'] = epslon_i
-#     return
-
-
-# # @numba.njit
-# def calc_eNRTL_method(idx_ctrl, species, I, T):
-#     A, _ = debye_huckel_constant(T)
-#     Ba = 1.5
-#     mj = np.power(10, np.array([sp.logc for sp in species])) #DO NOT NEED TO BE CALCULATED FOR EACH SPECIES, FIXME
-#     for sp in species:
-#         eik = sp.p_array['eik']
-#         sum_interactions = eik @ mj
-#         logg = -A*sp.z**2*np.sqrt(I)/(1+Ba*np.sqrt(I)) + sum_interactions
-
-#         sp.set_log_gamma(logg)
-#     pass
-
-
-# ## AUXILIARIES
-
-# def logic_dh_fallback(sp, db_species):
-#     I_factor, dh_a, dh_b = species_definition_dh_model(sp.name, db_species)
-#     sp.p_scalar['I_factor'] = I_factor
-#     sp.p_scalar['dh_a'] = dh_a
-#     sp.p_scalar['dh_b'] = dh_b
-#     return
-
-
-# def get_charge_of_specie(tag):
-#     num_plus = len([c for c in tag if c == '+'])
-#     num_minus = len([c for c in tag if c == '-'])
-#     if num_plus > 0:
-#         return +num_plus
-#     elif num_minus > 0:
-#         return -num_minus
-#     else:
-#         return 0
-
-
-# def species_definition_dh_model(tag, species_activity_db):
-#     z = get_charge_of_specie(tag)
-#     if tag not in species_activity_db:
-#         if z == 0:
-#             I_factor = 0.1
-#             dh_a = np.nan
-#             dh_b = np.nan
-#         else: # Else should use davies
-#             I_factor = np.nan
-#             dh_a = np.nan
-#             dh_b = np.nan
-#     else:
-#         db_specie = species_activity_db[tag]
-#         try:
-#             if 'I_factor' in db_specie:
-#                 I_factor = db_specie['I_factor']
-#                 dh_a = np.nan
-#                 dh_b = np.nan
-#             else:
-#                 I_factor = np.nan
-#                 dh_a = db_specie['dh']['phreeqc']['a']
-#                 dh_b = db_specie['dh']['phreeqc']['b']
-#         except KeyError as e:
-#             print('Error getting activity of specie = {}'.format(tag))
-#             raise e
-#     return I_factor, dh_a, dh_b
-
-
-# # @numba.njit
-# def debye_huckel_constant(TK):
-#     epsilon = properties_utils.dieletricconstant_water(TK)
-#     rho = properties_utils.density_water(TK)
-#     A = 1.82483e6*np.sqrt(rho)/(epsilon*TK)**1.5 # (L/mol)^1/2
-#     B = 50.2916*np.sqrt(rho/(epsilon*TK)) # Angstrom^-1 . (L/mol)^1/2
-#     return A, B
-
-
-# # @numba.njit
-# def log10gamma_davies(I, z, A):
-#     sqI = np.sqrt(I)
-#     logGamma = -A*z**2*(sqI/(1.0+sqI) - 0.3*I)
-#     return logGamma
+def calc_log_gamma_pitzer_pengrobinson(idx_ctrl, species, I, T): #FIXME: idx_ctrl to reaction_sys ?
+    """ Activity Coef. Calculation with Pitzer
+
+    - H2O as log mean
+    - Non-neutral species such as CaOH+, CaHCO3+ are not treated from mean approach, but from the pitzer log cation/anion
+
+
+    Parameters
+    ----------
+    idx_ctrl : FIXME
+        Auxilar structure for getting index of species
+    species : list
+        List of species
+    I : float
+        Ionic Strength
+    T : float
+        Temperature
+    """
+    sp0 = species[0]
+    i_neutrals = sp0.p_iarray['i_neutrals']
+    cations = [sp for sp in species if sp.z > 0]
+    anions = [sp for sp in species if sp.z < 0]
+    m_c = np.array([sp.logc for sp in cations])
+    m_c = 10**m_c
+    m_a = np.array([sp.logc for sp in anions])
+    m_a = 10**m_a
+    neutrals = [species[i] for i in i_neutrals]
+    m_n = np.array([sp.logc for sp in neutrals])
+    m_n = 10**m_n
+    z_c = sp0.p_iarray['z_c']
+    z_a = sp0.p_iarray['z_a']
+    Lambda_c = sp0.p_matrix['Lambda_c']
+    Lambda_a = sp0.p_matrix['Lambda_a']
+    Theta_c = sp0.p_matrix['Theta_c']
+    Theta_a = sp0.p_matrix['Theta_a']
+    Cf = sp0.p_matrix['Cf']
+    Beta = sp0.p_matrix['Beta']
+
+    skip_tern = True
+    anan = np.array([np.nan])
+    a2nan = np.array([[np.nan], [np.nan]])
+    for i, sp in enumerate(cations):
+        logg = pitzer.loggammam(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
+            Theta_c, Theta_a, anan, anan, Lambda_c, T, i, skip_tern)/np.log(10)
+        sp.set_log_gamma(logg)
+
+    for i, sp in enumerate(anions):
+        logg = pitzer.loggammax(m_c, m_a, m_n, z_c, z_a, Beta, Cf,
+            Theta_c, Theta_a, anan, anan, Lambda_a, T, i, skip_tern)/np.log(10)
+        sp.set_log_gamma(logg)
+
+    for i, sp in enumerate(neutrals): #FIXME: epnca-ternary-remove; why m_n not used?
+        logg = pitzer.logneutro(m_c, m_a, Lambda_c, Lambda_a, a2nan, i, skip_tern)/np.log(10)
+        sp.set_log_gamma(logg)
+
+    # Mean Activity species:
+    for sp in species:
+        if not sp.p_int['use_mean_act']:
+            continue
+        aux = 0.0
+        stoic_sum = 0.0
+        for tag, stoic in sp.d['mean_coefs'].items():
+            sp_ion = species[idx_ctrl.idx[tag]]
+            aux += stoic[0]*sp_ion.logg
+            stoic_sum += stoic[0]
+        log_g_mean = aux / stoic_sum
+        sp.set_log_gamma(log_g_mean)
+
+    for sp in species:
+        if '(g)' in sp.name: #gas phase
+            pCO2 = sp.p_scalar['P']
+            logfiCO2 = PengRobinson.fugacidade(T, pCO2)
+            logfCO2 = np.log10(np.exp(logfiCO2)*pCO2)
+            logg = logfCO2 #Is the log fugacity for gas...
+            sp.set_log_gamma(logg)
+
+    spH2O = species[idx_ctrl.idx['H2O']]
+    # sum_molal = np.array([10**sp.logc for sp in species if sp.name != 'H2O']).sum()
+    ln_ac_water = pitzer.activitywater(
+        m_c,
+        m_a,
+        m_n,
+        z_c,
+        z_a,
+        Beta,
+        Cf,
+        Theta_c,
+        Theta_a,
+        Lambda_c,
+        Lambda_a,
+        T
+    )
+    logac_water = ln_ac_water/np.log(10)
+    spH2O.set_log_gamma(logac_water)
+
+    pass
+
+# fmt: on
+
+# -------------------------------
+# Bromley Model
+# -------------------------------
+
+
+def setup_bromley_method_Binteration(reaction_sys, T, db_species, c_feed=None):
+    """
+    From interation B12 - Halted
+    """
+    anions = [sp for sp in reaction_sys.species if sp.z < 0]
+    cations = [sp for sp in reaction_sys.species if sp.z > 0]
+    for c in cations:
+        for a in anions:
+            try:
+                c.p_scalar[a.name] = db_species["bromley"][c.name][a.name]
+            except KeyError:
+                c.p_scalar[a.name] = 0.0
+    return
+
+
+def setup_bromley_method_Bindividual(reaction_sys, T, db_species, c_feed=None):
+    """
+    From individual ions B values
+    """
+    db = db_species["bromley-individuals"]
+    anions = [sp for sp in reaction_sys.species if sp.z < 0]
+    cations = [sp for sp in reaction_sys.species if sp.z > 0]
+    for c in cations:
+        for a in anions:
+            try:
+                Bplus = db[c.name]["B"]
+                Bminus = db[a.name]["B"]
+                dplus = db[c.name]["d"]
+                dminus = db[a.name]["d"]
+                Bca = Bplus + Bminus + dplus * dminus
+            except KeyError:
+                Bca = 0.0
+            c.p_scalar[a.name] = Bca
+    return
+
+
+# @numba.njit
+def bromley_model_ion(I, Bi_j, zi, zj, mj):
+    TK = 25.0 + 273.15
+    A, _ = debye_huckel_constant(TK)
+
+    e = 4.8029e-10  # erg
+    k = 1.38045e-16  # erg
+    Na = 6.02214076e23
+    d0 = properties_utils.density_water(TK)
+    D = properties_utils.dieletricconstant_water(TK)
+    A = (
+        1
+        / 2.303
+        * (e / np.sqrt(D * k * TK)) ** 3
+        * np.sqrt(2 * np.pi * d0 * Na / 1000.0)
+    )
+
+    sqI = np.sqrt(I)
+    zz = np.abs(zi * zj)
+    nBij = (0.06 + 0.6 * Bi_j) * zz
+    dBij = (1.0 + (1.5 / (zz)) * I) ** 2
+    dotBij = nBij / dBij + Bi_j
+    Zij = (np.abs(zi) + np.abs(zj)) / 2.0
+    Fi = np.sum(dotBij * Zij ** 2 * mj)
+
+    loggi = -A * zi ** 2 * sqI / (1.0 + sqI) + Fi
+
+    return loggi
+
+
+# @numba.njit
+def calc_bromley_method(idx_ctrl, species, I, T):
+    anions = [sp for sp in species if sp.z < 0]
+    cations = [sp for sp in species if sp.z > 0]
+
+    for c in cations:
+        Bi_j = np.array([c.p_scalar[a.name] for a in anions])
+        z_j = np.array([a.z for a in anions])
+        mj = np.power(10, np.array([a.logc for a in anions]))
+        loggC = bromley_model_ion(I, Bi_j, c.z, z_j, mj)
+        c.set_log_gamma(loggC)
+
+    for a in anions:
+        Bi_j = np.array([c.p_scalar[a.name] for c in cations])
+        z_j = np.array([c.z for c in cations])
+        mj = np.power(10, np.array([c.logc for c in cations]))
+        loggA = bromley_model_ion(I, Bi_j, a.z, z_j, mj)
+        a.set_log_gamma(loggA)
+
+    # FIXME!!
+    # species[idx_ctrl.idx['H2O']].set_log_gamma(-1.609437912)
+    pass
+
+
+# -------------------------------
+# Specific Ion Interaction Theory (SIT) Model
+# Same reference as PHREEQC:
+# Grenthe et al_1997_Modelling in aquatic chemistry.pdf
+# -------------------------------
+
+
+def setup_SIT_model(reaction_sys, T, db_species, c_feed=None):
+    """
+    SIT Method as in Ref: Grenthe et al_1997_Modelling in aquatic chemistry.pdf
+    """
+    db_species = db_species["sit"]
+    species = reaction_sys.species
+    all_eps_names = [sp.name for sp in species]
+
+    for sp_i in species:
+        epslon_i = np.empty(len(species))
+        for k, sp_name_k in enumerate(all_eps_names):
+            try:
+                e_ik = db_species[sp_i.name][sp_name_k]
+            except KeyError:
+                e_ik = 0.0
+            epslon_i[k] = e_ik
+
+        sp_i.p_array["eik"] = epslon_i
+    return
+
+
+def calc_sit_method(idx_ctrl, species, I, T):
+    A, _ = debye_huckel_constant(T)
+    Ba = 1.5
+    mj = np.power(
+        10, np.array([sp.logc for sp in species])
+    )  # DO NOT NEED TO BE CALCULATED FOR EACH SPECIES, FIXME
+    for sp in species:
+        eik = sp.p_array["eik"]
+        sum_interactions = eik @ mj
+        logg = (
+            -A * sp.z ** 2 * np.sqrt(I) / (1 + Ba * np.sqrt(I))
+            + sum_interactions
+        )
+
+        sp.set_log_gamma(logg)
+    pass
+
+
+# -------------------------------
+# e-NRTL
+# Chen
+# title = {A local composition model for the excess {Gibbs} energy of aqueous electrolyte systems},
+# -------------------------------
+
+db_enrtl_debug = {
+    "Na": {
+        "tau": {
+            "H2O": -4.5916,
+        }
+    },
+    "H2O": {
+        "tau": {
+            "H2O": 9.0234,
+        }
+    },
+}
+
+
+def setup_eNRTL_model(reaction_sys, T, db_species, c_feed=None):
+    """
+    eNRTL Method Chen (1986)
+    """
+    db_species = db_enrtl_debug
+    species = reaction_sys.species
+    all_eps_names = [sp.name for sp in species]
+
+    for sp_i in species:
+        epslon_i = np.empty(len(species))
+        for k, sp_name_k in enumerate(all_eps_names):
+            try:
+                e_ik = db_species[sp_i.name][sp_name_k]
+            except KeyError:
+                e_ik = 0.0
+            epslon_i[k] = e_ik
+
+        sp_i.p_array["eik"] = epslon_i
+    return
+
+
+# @numba.njit
+def calc_eNRTL_method(idx_ctrl, species, I, T):
+    A, _ = debye_huckel_constant(T)
+    Ba = 1.5
+    mj = np.power(
+        10, np.array([sp.logc for sp in species])
+    )  # DO NOT NEED TO BE CALCULATED FOR EACH SPECIES, FIXME
+    for sp in species:
+        eik = sp.p_array["eik"]
+        sum_interactions = eik @ mj
+        logg = (
+            -A * sp.z ** 2 * np.sqrt(I) / (1 + Ba * np.sqrt(I))
+            + sum_interactions
+        )
+
+        sp.set_log_gamma(logg)
+    pass
+
+
+## AUXILIARIES
+
+
+def logic_dh_fallback(sp, db_species):
+    I_factor, dh_a, dh_b = species_definition_dh_model(sp.name, db_species)
+    sp.p_scalar["I_factor"] = I_factor
+    sp.p_scalar["dh_a"] = dh_a
+    sp.p_scalar["dh_b"] = dh_b
+    return
+
+
+def get_charge_of_specie(tag):
+    num_plus = len([c for c in tag if c == "+"])
+    num_minus = len([c for c in tag if c == "-"])
+    if num_plus > 0:
+        return +num_plus
+    elif num_minus > 0:
+        return -num_minus
+    else:
+        return 0
+
+
+def species_definition_dh_model(tag, species_activity_db):
+    z = get_charge_of_specie(tag)
+    if tag not in species_activity_db:
+        if z == 0:
+            I_factor = 0.1
+            dh_a = np.nan
+            dh_b = np.nan
+        else:  # Else should use davies
+            I_factor = np.nan
+            dh_a = np.nan
+            dh_b = np.nan
+    else:
+        db_specie = species_activity_db[tag]
+        try:
+            if "I_factor" in db_specie:
+                I_factor = db_specie["I_factor"]
+                dh_a = np.nan
+                dh_b = np.nan
+            else:
+                I_factor = np.nan
+                dh_a = db_specie["dh"]["phreeqc"]["a"]
+                dh_b = db_specie["dh"]["phreeqc"]["b"]
+        except KeyError as e:
+            print("Error getting activity of specie = {}".format(tag))
+            raise e
+    return I_factor, dh_a, dh_b
+
+
+# @numba.njit
+def debye_huckel_constant(TK):
+    epsilon = properties_utils.dieletricconstant_water(TK)
+    rho = properties_utils.density_water(TK)
+    A = 1.82483e6 * np.sqrt(rho) / (epsilon * TK) ** 1.5  # (L/mol)^1/2
+    B = 50.2916 * np.sqrt(rho / (epsilon * TK))  # Angstrom^-1 . (L/mol)^1/2
+    return A, B
+
+
+# @numba.njit
+def log10gamma_davies(I, z, A):
+    sqI = np.sqrt(I)
+    logGamma = -A * z ** 2 * (sqI / (1.0 + sqI) - 0.3 * I)
+    return logGamma
