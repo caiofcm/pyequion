@@ -702,7 +702,9 @@ def equilibrate_phase(
     return fsol.root
 
 
-def get_total_element(solution, element, get_which_tags=False):
+def get_total_element(
+    solution, element, get_which_tags=False, only_liquid=True
+):
     """Get total concentration of a element
 
     Parameters
@@ -723,7 +725,11 @@ def get_total_element(solution, element, get_which_tags=False):
     a, d_sp = rbuilder.get_species_indexes_matching_element(
         solution.specie_names, element, solution.idx
     )
-    m_tot = solution.c_molal[d_sp].sum()
+    keys_tags = list(a.keys())
+    idxs_use = d_sp
+    if not only_liquid:
+        idxs_use = [d_sp[i] for i, k in enumerate(keys_tags) if "(s)" not in k]
+    m_tot = solution.c_molal[idxs_use].sum()
 
     if get_which_tags:
         return m_tot, a

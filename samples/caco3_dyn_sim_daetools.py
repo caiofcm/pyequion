@@ -111,15 +111,13 @@ def calc_B(S):
     # Verdoes 92
     Eb = 12.8
     Ks = 1.4e18
-    in_exp = -Eb / (np.log(S)) ** 2
+    in_exp = -Eb / ((np.log(S)) ** 2)
     # if in_exp < -300.0:
     #     return 0.0
     B = Ks * S * np.exp(in_exp)
     # B *= (self.V*1e-6) * 60.0 #to #/min
 
-    # MODIFY JUST FOR TEST
-    # B *= 1e-6 #TOO HIGH VALUES...
-    return B * 1e-3  # * 0.0 #MOD # : #/kg
+    return B * 1e-3  # : #/m^3/s -> #/kg/s
 
 
 def calc_G(S):
@@ -189,9 +187,7 @@ class modelCaCO3Precip(daeModel):
         C = [cNa, cC, cCa, cCl]
 
         kappa = 1e-6  # Constant(1e-6 * m) #dimensionless auxiliary param
-        mu0_ref = (
-            1e20  # Constant(1e20 * m**(-3)) #dimensionless auxiliary param
-        )
+        mu0_ref = 1e20  # dimensionless auxiliary param
         # mu_refs = [mu0_ref*kappa**k for k in range(0,4)]
 
         "Element Conservation"

@@ -147,12 +147,9 @@ def pyequion_api(request):
                     sys_eq.solid_reactions_but_not_equation
                 )
             )
-            for r_solid in solid_possible_reactions:
-                prev_keys = list(r_solid.keys())
-                for in_element in prev_keys:
-                    if "phase_name" in r_solid and "(s)" in in_element:
-                        tag_add = in_element + "__" + r_solid["phase_name"]
-                        r_solid[tag_add] = r_solid.pop(in_element)
+            pyequion.rbuilder.fill_reactions_with_solid_name_underscore(
+                solid_possible_reactions
+            )
             # for item in reactions:
             # solid_possible_reactions = [{k:float(v) for k,v in item.items() if k[0].isupper()} for item in reactions]
             solid_possible_reactions_latex = (

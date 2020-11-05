@@ -432,4 +432,15 @@ reactions_solids = [  # Reaction: solid allways negative coefficient!
         "type": "rev",
         "phase_name": "Goethite",
     },
+    {
+        "K2SO4(s)": -1.0,
+        "K+": 2.0,
+        "SO4--": 1.0,
+        "log_K25": -1.850,
+        "log_K_coefs": "",
+        "deltah": 5.7552581,  # 24.080 kJ/mol -> 5.7552581 kcal/mol
+        # "log_K_coefs": [2.36863E+0, 0.0, -1.25778E+3, 0.0],
+        "type": "rev",
+        "phase_name": "Arcanite",
+    },
 ]

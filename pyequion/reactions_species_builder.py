@@ -1070,10 +1070,19 @@ def get_list_of_reactions_latex(
     return reacs_formatted
 
 
-def display_reactions(sys_eq):
+def display_reactions(sys_eq, show_possible_solid=False):
     latex_reactions = format_reaction_list_as_latex_mhchem(
         sys_eq.reactionsStorage
     )
+    if show_possible_solid:
+        solid_possible_reactions = conv_reaction_engine_to_db_like(
+            sys_eq.solid_reactions_but_not_equation
+        )
+        fill_reactions_with_solid_name_underscore(solid_possible_reactions)
+        solid_possible_reactions_latex = format_reaction_list_as_latex_mhchem(
+            solid_possible_reactions
+        )
+        latex_reactions += solid_possible_reactions_latex
     try:
         from IPython.display import display, Math, Latex
 
@@ -1096,6 +1105,15 @@ def ipython_display_reactions(sol: SolutionResult):
     latex_reactions = format_reaction_list_as_latex_mhchem(sol.reactions)
     [display(Math(r)) for r in latex_reactions]
     return
+
+
+def fill_reactions_with_solid_name_underscore(solid_possible_reactions):
+    for r_solid in solid_possible_reactions:
+        prev_keys = list(r_solid.keys())
+        for in_element in prev_keys:
+            if "phase_name" in r_solid and "(s)" in in_element:
+                tag_add = in_element + "__" + r_solid["phase_name"]
+                r_solid[tag_add] = r_solid.pop(in_element)
 
 
 #####################################
