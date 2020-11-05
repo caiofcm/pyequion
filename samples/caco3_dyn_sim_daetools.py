@@ -15,11 +15,11 @@ from time import localtime, strftime
 import numpy as np
 from daetools.pyDAE import *
 from daetools.solvers.trilinos import pyTrilinos
-from res_nahco3_cacl2_reduced_T_2 import res as res_speciation
+# from res_nahco3_cacl2_reduced_T_2 import res as res_speciation
 from res_nahco3_cacl2_T_2 import res as res_speciation
 import pyequion
 import aux_create_dynsim
-import daetools_cm
+# import daetools_cm
 
 # import pyequion
 # Standard variable types are defined in variable_types.py
