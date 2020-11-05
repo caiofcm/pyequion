@@ -69,6 +69,7 @@ def solve_solution(
     fugacity_calculation="ideal",  # 'ideal'or 'pr', maybe a UDF
     fixed_elements=None,
     jac=None,
+    check_feed_neutrality=True,
 ):
     """The main function for equilibrium calculation in PyEquIon
 
@@ -180,7 +181,7 @@ def solve_solution(
         )
 
     ## Neutrality Checking:
-    if not np.any(np.isnan(comps_vals)):
+    if not np.any(np.isnan(comps_vals)) and check_feed_neutrality:
         charges = np.array(
             [rbuilder.get_charge_of_specie(tag) for tag in feed_compounds]
         )

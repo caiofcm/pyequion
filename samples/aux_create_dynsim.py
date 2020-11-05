@@ -1,6 +1,6 @@
 import os
 import pyequion
-import daetools_cm
+# import daetools_cm
 from matplotlib import pyplot as plt
 
 sys_reactions_simpler = [
