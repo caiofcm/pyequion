@@ -70,6 +70,9 @@ To create the test report:
 pytest --cov=pyequion ./tests/test_reactions_species_builder.py --cov-report=html
 ```
 
+## Contributing
+
+The code is formatted with black following flack8 specifications. Run `black .` to format the code.
 
 ## Helpers
 
