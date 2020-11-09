@@ -437,9 +437,18 @@ reactions_solids = [  # Reaction: solid allways negative coefficient!
         "K+": 2.0,
         "SO4--": 1.0,
         "log_K25": -1.850,
-        "log_K_coefs": "",
-        "deltah": 5.7552581,  # 24.080 kJ/mol -> 5.7552581 kcal/mol
-        # "log_K_coefs": [2.36863E+0, 0.0, -1.25778E+3, 0.0],
+        # "log_K_coefs": "",
+        # "deltah": 5.7552581,  # 24.080 kJ/mol -> 5.7552581 kcal/mol
+        # "log_K_coefs": [2.36863E+0, 0.0, -1.25778E+3, 0.0], #I guess was from sit.dat
+        "log_K_coefs": [
+            674.142,
+            0.30423,
+            -18037,
+            -280.236,
+            0,
+            -1.44055e-4,
+        ],  # From Appelo (2015)
+        # "log_K_coefs": [674.142, 0.30423, 0, 0, 0, 0],
         "type": "rev",
         "phase_name": "Arcanite",
     },

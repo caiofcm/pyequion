@@ -500,7 +500,7 @@ reactions_solutions = [
         "deltah": "",
         "type": "rev",
     },
-    {
+    {  # CHECK
         "K+": -1.0,
         "SO4--": -1.0,
         "KSO4-": 1.0,

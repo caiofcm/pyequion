@@ -116,6 +116,22 @@ species = {
                 "SO4--": [0.01958, 1.1130, 0],  # G-A-Book
             },
         },
+        "K+": {
+            "c-c": {
+                "H+": 0.005,
+            },
+            "c-a": {
+                "SO4--": 8.18e-3,  # FIXME: ITS TEMPERATURE DEPENDENT, INCLUDE THIS FEATURE
+            },
+            "beta": {
+                "HSO4-": [-0.0003, 0.1735, 0],
+                "SO4--": [
+                    3.17e-2,
+                    0.756,
+                    0,
+                ],  # B0 and B1 is T Dependent! FIXME
+            },
+        },
         "OH-": {
             "a-a": {"CO3--": 0.1, "Cl-": 0.1}
             # "a-c": {
