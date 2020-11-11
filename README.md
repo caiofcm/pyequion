@@ -89,9 +89,7 @@ The code is formatted with black following flack8 specifications. Run `black .` 
 - Fabio Ramos
 - Amaro G. Barreto Jr
 
-## References:
 
-- Appelo, C. A. J., & Postma, D. (2004). Geochemistry, groundwater and pollution. CRC press.
 
 
 
