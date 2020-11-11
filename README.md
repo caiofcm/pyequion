@@ -18,6 +18,8 @@ A pure python implementation for electrolytes chemical equilibrium.
 
 A simplified version is provided with a web based user interface: https://caiofcm.github.io/pyequion-onl/
 
+Repository: https://github.com/caiofcm/pyequion
+
 ## Features
 
 - Pure python package: hence it is easy to install in any platform

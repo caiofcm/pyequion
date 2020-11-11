@@ -954,6 +954,44 @@ def save_res_to_file(
     pass
 
 
+def create_graphviz_dot(esys):
+    from graphviz import Digraph  # Only import if user call this function
+
+    dot = Digraph()
+    for i, r in enumerate(esys.reactionsStorage):
+        name = "k{}".format(i)
+        reags = [k for k in r if r[k] < 0]
+        prods = [k for k in r if r[k] > 0]
+        dot.attr("node", shape="ellipse")
+        [dot.node(reag) for reag in reags]
+        [dot.node(prod) for prod in prods]
+        dot.attr("node", shape="point")
+        [dot.node(name, "") for prod in prods]
+        #     [dot.edge(reag, name, arrowhead='none') for reag in reags]
+        [dot.edge(reag, name, arrowhead="none") for reag in reags]
+        [dot.edge(name, prod, arrowhead="none") for prod in prods]
+    return dot
+
+
+def save_equilibrium_as_graphviz(esys, path, formatting="svg"):
+    """Save the equilibrium system as a graphical network representation
+
+    Parameters
+    ----------
+    esys : pyequion.EquilibriumSystem
+        The equilibrium system
+    path : file type (str)
+        The path to save the file
+    formatting : str, optional
+        The format to save the graph, see graphviz docs for python, by default 'svg'
+        e.g. ['svg', 'pdf', 'png']
+    """
+    dot = create_graphviz_dot(esys)
+    dot.format = formatting
+    dot.render(path)
+    return
+
+
 ###########################################################
 ###########################################################
 # Internal functions (high level auxiliaries)

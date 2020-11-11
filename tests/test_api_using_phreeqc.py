@@ -1,3 +1,12 @@
+"""
+test_api_using_phreeqc.py
+
+Test file to compared pyequion solution with phreeqc using phreeqc.dat database,
+which is a B-dot with Davies equation fallback.
+
+The phreeqc solution was beforehand generated and saved to a file to avoid the dependency on this package.
+"""
+
 import os
 
 # os.environ['NUMBA_DISABLE_JIT'] = '1' #SHOULD WORK WITH 0 ALSO
@@ -24,17 +33,6 @@ import pyequion
 from pyequion import solve_solution, ClosingEquationType
 from SAVE_SOLUTIONREF import SAVE_SOLUTIONREF as REF_SOLUTIONS
 
-## Observations
-"""
-Allow Precipitation is not testing the amount precipitation, only pH.
-Not sure how to make the same operation in phreeqc, I could manually get information in aqion.
-
-Automatic precipitation halted = Its not the same calculation...
-
-- EXCLUDE OXIDES
-- EXCLUDE REDOX EQUATIONS
-
-"""
 
 # THIS LINE WILL COMPILE FUNCTION with numba
 # pyequion.core.jit_compile_functions()
@@ -780,6 +778,9 @@ def test_phreeqpython_Chlorite_closed_open():
     assert_solid(solution, solution_ref2, tol={"si": 1e-1})
 
 
+@pytest.mark.xfail(
+    reason="Redox not implemented and Arcanite is not in the generated phreeqc.dat file"
+)
 def test_phreeqpython_hematite_and_many_more_closed_open():
     fname = inspect.stack()[0][3]
     """
@@ -787,6 +788,8 @@ def test_phreeqpython_hematite_and_many_more_closed_open():
     The redux is needed to provide Fe+++ from Fe++
     Thus, for a proper execution of Fe solids I will need to implement the redox
     scheme.
+
+    FAILING HERE: Arcanite not in the phreeqc.dat database
     """
     comp_dict = {"FeCO3": 10.0, "K2SO4": 10.0, "Al(OH)3": 10.0}
     start = time.time()
