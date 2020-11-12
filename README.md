@@ -88,7 +88,7 @@ The code is formatted with black following flack8 specifications. Run `black .` 
 - Elvis do Amaral Soares
 - Fabio Ramos
 - Amaro G. Barreto Jr
-
+- Danilo Naiff
 
 
 
