@@ -23,6 +23,7 @@ List of main dependencies:
 Additional functionality dependencies:
 
 * numba>=0.45
+* graphviz
 
 Additional dependencies for sample cases:
 

@@ -27,9 +27,8 @@ from .utils import ClosingEquationType
 # --------------------------------------------
 
 
-# FIXME: Irreversible Equations
-# Necessary for the correct element identification
-# Also Including CO2 = CO2(g) Henry constant, but should be treat later as a gas FIXME
+# Irreversible Equations "Database"
+# This list is far from extensive. Strong electrolytes should be added here.
 reactionsListIrreversible = [
     # FIXME Automatic irreversible for: Cl-
     {"CaCl2": -1, "Ca++": 1, "Cl-": 2, "type": "irrev", "id_db": -1},
@@ -40,8 +39,9 @@ reactionsListIrreversible = [
     {"K2SO4": -1, "K+": 2, "SO4--": 1, "type": "irrev", "id_db": -1},
     {"BaCl2": -1, "Ba++": 1, "Cl-": 2, "type": "irrev", "id_db": -1},
     {"NaHSO4": -1, "Na+": 1, "HSO4-": 1, "type": "irrev", "id_db": -1},
+    {"Na2SO4": -1, "Na+": 2, "HSO4-": 1, "type": "irrev", "id_db": -1},
+    {"H2SO4": -1, "H+": 2, "SO4-": 1, "type": "irrev", "id_db": -1},
     {"Al2(SO4)3": -1, "Al+++": 2, "SO4--": 3, "type": "irrev", "id_db": -1},
-    # {'CO2': 1, 'CO2(g)': -1, 'type': 'henry', 'log_K25': -1.468, 'log_K_coefs': ''}, #FIXME
 ]
 
 reactionsListVapourPhase = [
