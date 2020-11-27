@@ -387,7 +387,7 @@ reactions_solids = [  # Reaction: solid allways negative coefficient!
         "H2S": 1.0,
         "log_K25": 4.882,
         "log_K_coefs": "",
-        "type": "rev",
+        "type": "electronic",
         "phase_name": "Sulfur",
     },
     {
