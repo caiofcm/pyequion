@@ -90,7 +90,45 @@ The code is formatted with black following flack8 specifications. Run `black .` 
 - Amaro G. Barreto Jr
 - Danilo Naiff
 
+## Folder Structure
 
+```
+.
+├── api # Application Programming Interface for web service
+├── data # Parameters database file (was replaced by python dictionaries in pyequion/data)
+├── docs # Documentation generation (sphinx)
+├── LICENSE.md #License file
+├── pyequion
+│   ├── activity_coefficients.py # Built-in thermodynamic models
+│   ├── conductivity.py # Conductivity function
+│   ├── core.py # Core functionalities
+│   ├── data # Parameters database as python files
+│   │   ├── __init__.py
+│   │   ├── reactions_solids.py
+│   │   ├── reactions_solutions.py
+│   │   └── species.py
+│   ├── __init__.py # Auxiliary
+│   ├── jit_helper.py # Auxiliary
+│   ├── PengRobinson.py # EOS for pure gas
+│   ├── pitzer.py # Pitzer model
+│   ├── properties_utils.py # Auxiliary
+│   ├── pyequion.py # Application Programming Interface for python call
+│   ├── reactions_species_builder.py # Creation of equilibrium system
+│   ├── read_from_phreeqc_db.py # Auxiliary
+│   ├── symbolic_computations.py # Symbolic Computation with sympy
+│   ├── utils_api.py # Auxiliary
+│   ├── utils_for_numba.py # Auxiliary
+│   ├── utils.py # Auxiliary
+│   └── wateractivity.py # Auxiliary for water activity in pitzer
+├── pyproject.toml #Linting configuration
+├── README.md # General guide
+├── requirements-dev.txt # Development Requirements
+├── requirements.txt # Main Requirements
+├── samples #Some samples using pyequion
+├── setup.py #Installation file
+└── tests # Automatic Unit tests folder (pytest based)
+
+```
 
 
 [1]: https://packaging.python.org/guides/tool-recommendations/
