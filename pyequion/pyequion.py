@@ -954,6 +954,140 @@ def save_res_to_file(
     pass
 
 
+def save_res_to_c_code(
+    sys_eq,
+    loc_path,
+    fun_name,
+    fixed_temperature=None,
+    setup_log_gamma=None,
+    calc_log_gamma=None,
+    activities_db_file_name=None,
+    activity_model_type=TypeActivityCalculation.DEBYE,
+    project_name="pyequion",
+):
+    from sympy.utilities.codegen import codegen
+    import sympy
+
+    res, x, args = core.generate_symbolic_residual(
+        sys_eq,
+        return_symbols=True,
+        setup_log_gamma=setup_log_gamma,
+        calc_log_gamma=calc_log_gamma,
+        fixed_temperature=fixed_temperature,
+        activities_db_file_name=activities_db_file_name,
+        activity_model_type=activity_model_type,
+    )
+
+    args_conc = args[0]
+    arg_T = args[1]
+    T_sym = sympy.symbols("T")
+    extra_arg = args[2]
+    extra_arg_sym = sympy.symbols("extra_arg")
+
+    mat_res = sympy.Matrix(res)
+    mat_x = sympy.MatrixSymbol("x", len(x), 1)
+    mat_concs = sympy.MatrixSymbol("concs", len(args_conc), 1)
+
+    x_array_map = dict(zip(x, mat_x))
+    concs_array_map = dict(zip(args_conc, mat_concs))
+
+    res_ind = mat_res.xreplace(x_array_map)
+    res_ind = res_ind.xreplace(concs_array_map)
+    res_ind = res_ind.xreplace({arg_T: T_sym})
+    res_ind = res_ind.xreplace({extra_arg: extra_arg_sym})
+
+    # Adjusting Ouput
+    sym_res = sympy.MatrixSymbol("res", len(mat_res), 1)
+    equation_res = sympy.Eq(sym_res, res_ind)
+
+    out_gen = codegen(
+        (fun_name, equation_res),
+        language="C99",
+        to_files=True,
+        project=project_name,
+    )
+    mod_sym.return_to_sympy_to_numpy()
+    return out_gen
+
+
+def save_jacobian_of_res_to_c_code(
+    sys_eq,
+    loc_path,
+    fun_name,
+    fixed_temperature=None,
+    setup_log_gamma=None,
+    calc_log_gamma=None,
+    activities_db_file_name=None,
+    activity_model_type=TypeActivityCalculation.DEBYE,
+    project_name="pyequion",
+):
+    """Save Jacobian of residual function to file
+
+    Parameters
+    ----------
+    sys_eq : EquilibriumSystem
+
+    loc_path : str
+        Path for saving the function
+    fun_name : str
+        Function name
+    fixed_temperature : float, optional
+        Fix temperature to remove from symbolic evaluation, by default None
+    """
+    from sympy.utilities.codegen import codegen
+    import sympy
+
+    res, x, args = core.generate_symbolic_residual(
+        sys_eq,
+        True,
+        setup_log_gamma,
+        calc_log_gamma,
+        fixed_temperature,
+        activities_db_file_name,
+        activity_model_type,
+    )
+    J = mod_sym.obtain_symbolic_jacobian(res, x)
+    # s = mod_sym.string_lambdastr_as_function(
+    #     J, x, args, fun_name, use_numpy=True, include_imports=True
+    # )
+    # s = mod_sym.numbafy_function_string(
+    #     s, numba_kwargs_string="cache=True", func_additional_arg="dummy=None"
+    # )  # added calc
+    # mod_sym.save_function_string_to_file(s, loc_path)
+
+    args_conc = args[0]
+    arg_T = args[1]
+    T_sym = sympy.symbols("T")
+    extra_arg = args[2]
+    extra_arg_sym = sympy.symbols("extra_arg")
+
+    mat_J = sympy.Matrix(J)
+    mat_x = sympy.MatrixSymbol("x", len(x), 1)
+    mat_concs = sympy.MatrixSymbol("concs", len(args_conc), 1)
+
+    x_array_map = dict(zip(x, mat_x))
+    concs_array_map = dict(zip(args_conc, mat_concs))
+
+    J_ind = mat_J.xreplace(x_array_map)
+    J_ind = J_ind.xreplace(concs_array_map)
+    J_ind = J_ind.xreplace({arg_T: T_sym})
+    J_ind = J_ind.xreplace({extra_arg: extra_arg_sym})
+
+    # Adjusting Ouput
+    sym_J = sympy.MatrixSymbol("J", *mat_J.shape)
+    equation_J = sympy.Eq(sym_J, J_ind)
+    print(equation_J)
+
+    out_gen = codegen(
+        (fun_name, equation_J),
+        language="C99",
+        to_files=True,
+        project=project_name,
+    )
+    mod_sym.return_to_sympy_to_numpy()
+    return out_gen
+
+
 def create_graphviz_dot(esys):
     from graphviz import Digraph  # Only import if user call this function
 
