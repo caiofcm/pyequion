@@ -29,7 +29,7 @@ Repository: https://github.com/caiofcm/pyequion
 - A modular approach for the activity coefficient calculation allows the usage of new thermodynamic models
 - Just in time compilation capabilities with `numba`
 - Automatic differentiation with `sympy`
-- Code generation for exporting the residual function for a giving system to other environments: suitable for kinetic simulations
+- Code generation for exporting the residual function for a giving system to other environments: suitable for kinetic simulations (e.g python or C)
 - Automatic determination of the mean activity coefficient (often used in comparison with experiments)
 
 ## Installation
