@@ -44,6 +44,7 @@ def prepare_for_sympy_substituting_numpy():
     # pyequion.pyequion.np = sympy
     pyequion.np = sympy
     pyequion.core.np = sympy
+    pyequion.conductivity.np = sympy
     return
 
 
@@ -53,6 +54,7 @@ def return_to_sympy_to_numpy():
     # pyequion.pyequion.np = numpy
     pyequion.np = numpy
     pyequion.core.np = numpy
+    pyequion.conductivity.np = numpy
     return
 
 

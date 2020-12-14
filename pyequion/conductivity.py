@@ -1,4 +1,8 @@
-import numpy as np
+import numpy
+import sympy
+
+global np
+np = numpy
 
 # Reference: http://www.aqion.de/site/194
 
@@ -27,13 +31,20 @@ def solution_conductivity(I, gamma, conc_vals, charges, cond_molar_zero):
         Conductivity in S/cm
     """
     ret = 0.0
-    for i in np.arange(len(conc_vals)):
+    for i in range(len(conc_vals)):
         if charges[i] == 0:
             continue
-        if I < 0.36 * charges[i]:
-            alpha = 0.6 / np.sqrt(np.abs(charges[i]))  # CHECKME
-        else:
-            alpha = np.sqrt(I) / charges[i]
+        if numpy.isscalar(I):
+            if I < 0.36 * abs(charges[i]):
+                alpha = 0.6 / np.sqrt(abs(charges[i]))  # CHECKME
+            else:
+                alpha = np.sqrt(I) / abs(charges[i])
+        else:  # Symbolic
+            alpha = sympy.Piecewise(
+                (0.6 / np.sqrt(abs(charges[i])), I < 0.36 * abs(charges[i])),
+                (np.sqrt(I) / abs(charges[i]), True),
+            )
+        # alpha = np.sqrt(I) / abs(charges[i])  # checking symbolic generation of solution
         aux = cond_molar_zero[i] * gamma[i] ** alpha * conc_vals[i]
         ret += aux
     ret *= 1e-3
