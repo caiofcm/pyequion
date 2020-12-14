@@ -963,12 +963,44 @@ def save_res_to_c_code(
     calc_log_gamma=None,
     activities_db_file_name=None,
     activity_model_type=TypeActivityCalculation.DEBYE,
+    include_jac=True,
+    constant_header_filename="eq_exported_constanst.h",
     project_name="pyequion",
 ):
+    """Create C-CODE of a equilibrium system
+
+    Parameters
+    ----------
+    sys_eq : EquilibriumSystem
+    loc_path : str
+    fun_name : str
+    fixed_temperature : float, optional
+        If number set the temperature to a fixed value, by default None
+    setup_log_gamma : callable, optional
+        A setup function to adjust the activity coefficient, by default None
+    calc_log_gamma : callable, optional
+        The activity coefficient function calculation, by default None
+    activities_db_file_name : str, optional
+        activity coefficient database file for species, by default None
+    activity_model_type : str | TypeActivityCalculation, optional
+        the model to use, by default TypeActivityCalculation.DEBYE
+    include_jac : bool, optional
+        To include the jacobian function in the exported file, by default True
+    constant_header_filename : str, optional
+        To include a header file with constants, by default True
+    project_name : str, optional
+        [description], by default "pyequion"
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+    # Check about -ffast-math
     from sympy.utilities.codegen import codegen
     import sympy
 
-    res, x, args = core.generate_symbolic_residual(
+    res, x, args, sol_sym = core.generate_symbolic_residual_(
         sys_eq,
         return_symbols=True,
         setup_log_gamma=setup_log_gamma,
@@ -984,30 +1016,142 @@ def save_res_to_c_code(
     extra_arg = args[2]
     extra_arg_sym = sympy.symbols("extra_arg")
 
-    mat_res = sympy.Matrix(res)
     mat_x = sympy.MatrixSymbol("x", len(x), 1)
     mat_concs = sympy.MatrixSymbol("concs", len(args_conc), 1)
 
     x_array_map = dict(zip(x, mat_x))
     concs_array_map = dict(zip(args_conc, mat_concs))
 
+    # Adjusting Ouput
+
+    mat_res = sympy.Matrix(res)
+    res_ind = replate_symb_expr_to_export(
+        mat_res,
+        x_array_map,
+        concs_array_map,
+        arg_T,
+        T_sym,
+        extra_arg,
+        extra_arg_sym,
+    )
+    sym_res = sympy.MatrixSymbol("res", len(mat_res), 1)
+    equation_res = sympy.Eq(sym_res, res_ind)
+
+    mat_gammas = sympy.Matrix(sol_sym.gamma)
+    gammas_ind = replate_symb_expr_to_export(
+        mat_gammas,
+        x_array_map,
+        concs_array_map,
+        arg_T,
+        T_sym,
+        extra_arg,
+        extra_arg_sym,
+    )
+    sym_gammas = sympy.MatrixSymbol("gammas", len(mat_gammas), 1)
+    equation_gammas = sympy.Eq(sym_gammas, gammas_ind)
+
+    func_tuples = [
+        (fun_name, equation_res),
+        ("calc_gammas", equation_gammas),
+    ]
+
+    if include_jac:
+        J = mod_sym.obtain_symbolic_jacobian(res, x)
+        mat_J = sympy.Matrix(J)
+        J_ind = replate_symb_expr_to_export(
+            mat_J,
+            x_array_map,
+            concs_array_map,
+            arg_T,
+            T_sym,
+            extra_arg,
+            extra_arg_sym,
+        )
+        sym_J = sympy.MatrixSymbol("J", *mat_J.shape)
+        equation_J = sympy.Eq(sym_J, J_ind)
+        func_tuples += [("calc_jac", equation_J)]
+
+    if constant_header_filename:
+        constants_str = create_string_for_ccode_idx_of_species(
+            sys_eq.idx_control.idx
+        )
+        with open(constant_header_filename, "w") as fp:
+            fp.write(constants_str)
+
+    if len(sol_sym.saturation_index) > 0:
+        SI_functions = []
+        for phase in sol_sym.saturation_index:
+            # mat_phase = sympy.Matrix(sol_sym.saturation_index[phase])
+            mat_phase = sol_sym.saturation_index[phase]
+            phase_ind = replate_symb_expr_to_export(
+                mat_phase,
+                x_array_map,
+                concs_array_map,
+                arg_T,
+                T_sym,
+                extra_arg,
+                extra_arg_sym,
+            )
+            # sym_phase = sympy.MatrixSymbol(phase, 1, 1)
+            # equation_phase = sympy.Eq(sym_phase, phase_ind)
+            SI_func = (
+                "calc_phase_SI_{}".format(phase),
+                phase_ind,
+            )
+            SI_functions += [SI_func]
+        func_tuples += SI_functions
+
+    # CodeGen Instance for CSE Enabled
+    c99codeGenCSE = sympy.utilities.codegen.C99CodeGen(
+        cse=True, project=project_name
+    )
+
+    # dummy = sympy.symbols('dummy')
+    out_gen = codegen(
+        func_tuples,
+        # language="C99",
+        code_gen=c99codeGenCSE,
+        to_files=True,
+        project=project_name,
+        # global_vars=(dummy,)
+    )
+    mod_sym.return_to_sympy_to_numpy()
+    return out_gen
+
+
+def replate_symb_expr_to_export(
+    mat_res,
+    x_array_map,
+    concs_array_map,
+    arg_T,
+    T_sym,
+    extra_arg,
+    extra_arg_sym,
+):
     res_ind = mat_res.xreplace(x_array_map)
     res_ind = res_ind.xreplace(concs_array_map)
     res_ind = res_ind.xreplace({arg_T: T_sym})
     res_ind = res_ind.xreplace({extra_arg: extra_arg_sym})
+    return res_ind
 
-    # Adjusting Ouput
-    sym_res = sympy.MatrixSymbol("res", len(mat_res), 1)
-    equation_res = sympy.Eq(sym_res, res_ind)
 
-    out_gen = codegen(
-        (fun_name, equation_res),
-        language="C99",
-        to_files=True,
-        project=project_name,
+def create_string_for_ccode_idx_of_species(idx_dic: dict) -> str:
+    str_of_idxs = ", ".join(
+        ['{{"{}", {}}}'.format(k, v) for k, v in idx_dic.items()]
     )
-    mod_sym.return_to_sympy_to_numpy()
-    return out_gen
+    header_for_constants = """
+#ifndef PYEQUION__CONSTANTS__H
+#define PYEQUION__CONSTANTS__H
+
+#include <map>
+
+std::map<std::string, int> IDX_SPECIES = {{ {} }};
+
+#endif
+""".format(
+        str_of_idxs
+    )
+    return header_for_constants
 
 
 def save_jacobian_of_res_to_c_code(
@@ -1068,19 +1212,28 @@ def save_jacobian_of_res_to_c_code(
     x_array_map = dict(zip(x, mat_x))
     concs_array_map = dict(zip(args_conc, mat_concs))
 
-    J_ind = mat_J.xreplace(x_array_map)
-    J_ind = J_ind.xreplace(concs_array_map)
-    J_ind = J_ind.xreplace({arg_T: T_sym})
-    J_ind = J_ind.xreplace({extra_arg: extra_arg_sym})
+    J_ind = replate_symb_expr_to_export(
+        mat_J,
+        x_array_map,
+        concs_array_map,
+        arg_T,
+        T_sym,
+        extra_arg,
+        extra_arg_sym,
+    )
 
     # Adjusting Ouput
     sym_J = sympy.MatrixSymbol("J", *mat_J.shape)
     equation_J = sympy.Eq(sym_J, J_ind)
-    print(equation_J)
+
+    c99codeGenCSE = sympy.utilities.codegen.C99CodeGen(
+        cse=True, project=project_name
+    )
 
     out_gen = codegen(
         (fun_name, equation_J),
-        language="C99",
+        # language="C99",
+        code_gen=c99codeGenCSE,
         to_files=True,
         project=project_name,
     )

@@ -946,6 +946,74 @@ def generate_symbolic_residual(
     return res
 
 
+def generate_symbolic_residual_(
+    sys_eq,
+    return_symbols=True,
+    setup_log_gamma=None,
+    calc_log_gamma=None,
+    fixed_temperature=None,
+    activities_db_file_name=None,
+    activity_model_type=act.TypeActivityCalculation.DEBYE,
+):
+    """Generate Symbolic Residual
+
+    Parameters
+    ----------
+    sys_eq : EquilibriumSystem
+        [description]
+    return_symbols : bool, optional
+        Also return symbols or only the residual, by default True
+    setup_log_gamma : callable, optional
+        Setup loggamma function, by default None
+    calc_log_gamma : callable, optional
+        Calculate loggamma function, by default None
+    fixed_temperature : float, optional
+        Fix temperature to remove from symbolic generation, by default None
+    activities_db_file_name : str, optional
+        Database file name of species, by default DEFAULT_DB_FILES['species']
+    activity_model_type : Enumeration, optional
+        Use a provided activity model instead of passing setup and calc function for activity, by default act.TypeActivityCalculation.DEBYE
+
+    Returns
+    -------
+    Symbolic Expression
+    """
+    if not activities_db_file_name:
+        activities_db_file_name = DEFAULT_DB_FILES["species"]
+    x = sympy.symbols("x0:{}".format(sys_eq.idx_control.idx["size"]))
+    num_args = sys_eq.num_of_feeds + 2  # FIXME: IS ERROR PRONE
+    args_symbols = sympy.symbols("args0:{}".format(num_args))
+    args = (
+        args_symbols[0 : sys_eq.num_of_feeds],
+        args_symbols[-2],
+        args_symbols[-1],
+    )
+    mod_sym.prepare_for_sympy_substituting_numpy()
+
+    setup_log_gamma, calc_log_gamma = default_activity_logic(
+        activity_model_type
+    )
+    species_activity_db = utils.load_from_db(activities_db_file_name)
+    c_feed, TK = args[0:2]
+    if fixed_temperature:
+        TK = fixed_temperature
+        args = (args_symbols[0 : sys_eq.num_of_feeds], TK, args_symbols[-1])
+    setup_log_gamma(sys_eq, TK, species_activity_db, c_feed)
+
+    res = sys_eq.residual(x, args, calc_log_gamma)
+
+    import pyequion
+
+    comps = args[0]
+    sol_sym = pyequion.get_solution_from_x(
+        sys_eq, x, comps, TC=TK - 273.15
+    )  # FIXME
+
+    if return_symbols:
+        return res, x, args, sol_sym
+    return res
+
+
 #####
 #####
 def default_activity_logic(
