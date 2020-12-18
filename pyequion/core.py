@@ -527,10 +527,13 @@ class EquilibriumSystem:
         elif self.closing_equation_type == 3:  # NONE
             idx_start = 0
 
-        res[idx_start : idx_start + len(self.reactions)] = [
-            reac.eq(sp, TK) for reac in self.reactions
-        ]
-        i_prev = idx_start + len(self.reactions)
+        if len(self.reactions) > 0:
+            res[idx_start : idx_start + len(self.reactions)] = [
+                reac.eq(sp, TK) for reac in self.reactions
+            ]
+            i_prev = idx_start + len(self.reactions)
+        else:
+            i_prev = 0
 
         if self.mass_balances[0].idx_feed[0][0] != -1:
             for i_mb in range(len(self.mass_balances)):
@@ -538,7 +541,8 @@ class EquilibriumSystem:
                     self.species, cFeed
                 )
             i_prev += len(self.mass_balances)
-        res[i_prev] = self.charge_conservation()
+        if i_prev > len(res):
+            res[i_prev] = self.charge_conservation()
         return res
 
     def residual_setup(self, x, args, calc_log_gamma):
@@ -614,7 +618,11 @@ class EquilibriumSystem:
         -------
         float
         """
-        return -self.species[self.idx_control.idx["H+"]].logact()
+        if "H+" in self.idx_control.idx:
+            pH = -self.species[self.idx_control.idx["H+"]].logact()
+        else:
+            pH = np.nan
+        return pH
 
     def get_I(self):
         """Calculate Ionic Strength

@@ -34,12 +34,15 @@ def solution_conductivity(I, gamma, conc_vals, charges, cond_molar_zero):
     for i in range(len(conc_vals)):
         if charges[i] == 0:
             continue
-        if numpy.isscalar(I):
+        if numpy.isscalar(I) or hasattr(
+            I, "NodeAsPlainText"
+        ):  # Logic for Numpy or adouble from daetools
             if I < 0.36 * abs(charges[i]):
                 alpha = 0.6 / np.sqrt(abs(charges[i]))  # CHECKME
             else:
                 alpha = np.sqrt(I) / abs(charges[i])
         else:  # Symbolic
+            print(I.__dir__())
             alpha = sympy.Piecewise(
                 (0.6 / np.sqrt(abs(charges[i])), I < 0.36 * abs(charges[i])),
                 (np.sqrt(I) / abs(charges[i]), True),

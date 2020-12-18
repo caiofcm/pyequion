@@ -14,7 +14,8 @@ sys_eq = pyequion.create_equilibrium(["NaHCO3", "CaCl2"])
 pyequion.save_res_to_c_code(
     sys_eq,
     "dummy",
-    "calc_cnv_res_equilibrium_NaHCO3_CaCl2"
+    "calc_cnv_res_equilibrium_NaHCO3_CaCl2",
+    include_jac=False,
     # ,fixed_temperature=25.0
 )
 

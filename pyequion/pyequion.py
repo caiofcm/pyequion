@@ -964,6 +964,7 @@ def save_res_to_c_code(
     activities_db_file_name=None,
     activity_model_type=TypeActivityCalculation.DEBYE,
     include_jac=True,
+    # include_d_phase_d_c=True,
     constant_header_filename="eq_exported_constanst.h",
     project_name="pyequion",
 ):
@@ -1100,6 +1101,10 @@ def save_res_to_c_code(
             )
             SI_functions += [SI_func]
         func_tuples += SI_functions
+
+        # if include_d_phase_d_c:
+
+        #     pass
 
     # CodeGen Instance for CSE Enabled
     c99codeGenCSE = sympy.utilities.codegen.C99CodeGen(
