@@ -262,7 +262,8 @@ def solve_solution_pre_loaded(
     jac=None,
 ):
 
-    comps_vals = [v * 1e-3 for v in comp_dict.values()]
+    # comps_vals = [v * 1e-3 for v in comp_dict.values()]
+    comps_vals = [comp_dict[key] * 1e-3 for key in reaction_system.feed_compounds]
     args = get_args_from_comps_dict(
         TC, comps_vals, close_type, co2_partial_pressure, carbon_total
     )
