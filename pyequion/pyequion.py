@@ -42,6 +42,7 @@ from .utils_for_numba import Dict, List, HAS_NUMBA
 #     from .jit_helper import jit_compile_functions
 try:
     from .jit_helper import jit_compile_functions
+    from numba import types,typed
 except ImportError:
     # print('Running No numba installed.')
     pass
@@ -278,6 +279,42 @@ def solve_solution_pre_loaded(
     solution = reaction_system.calculate_properties(fsol.success)
     return solution
 
+def solve_solution_fixed_species_pre_loaded(comp_dict,
+    reaction_system,
+    x_guess,
+    TC=25.0,
+    close_type=None, carbon_total=0.0,
+    calc_log_gamma=activity_coefficients.calc_log_gamma_dh_bdot,
+    initial_feed_mass_balance=None,
+    co2_partial_pressure=core.pCO2_ref,
+    user_solver_function=None,
+    # fugacity_calculation='ideal', #'ideal'or 'pr', maybe a UDF
+    jac=None
+    ):
+    comps_vals = [v*1e-3 for v in comp_dict.values()] #DUMMY VARIABLE
+    fixed_species_log = dict([(name,np.log10(v*1e-3)) for name,v in comp_dict.items()])
+    try:
+        fixed_species_log_numbafied = typed.Dict.empty(
+            key_type = types.unicode_type,
+            value_type = types.float64
+        )
+    except NameError:
+        fixed_species_log_numbafied = dict()
+    for key,value in fixed_species_log.items():
+        fixed_species_log_numbafied[key] = value
+
+    args = get_args_from_comps_dict(TC, comps_vals, close_type, co2_partial_pressure, carbon_total)
+    args_calc_gamma = (args, fixed_species_log_numbafied, calc_log_gamma)
+    if user_solver_function:
+        solver_function = user_solver_function
+    else:
+        solver_function = solve_with_exception
+    fsol = solver_function(reaction_system.residual_fixed_species,
+        x_guess, args_calc_gamma,
+        jac=jac
+    )
+    solution = reaction_system.calculate_properties(fsol.success)
+    return solution
 
 def setup_system_for_direct_run(
     reaction_system,
