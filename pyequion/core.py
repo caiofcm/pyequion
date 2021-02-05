@@ -541,7 +541,7 @@ class EquilibriumSystem:
                     self.species, cFeed
                 )
             i_prev += len(self.mass_balances)
-        if i_prev > len(res):
+        if i_prev < len(res):
             res[i_prev] = self.charge_conservation()
         return res
 
