@@ -13,10 +13,10 @@ class ClosingEquationType:
     - NONE: Let the package provide all the equations (obatined from the input file)
     """
 
-    OPEN = 0
-    CARBON_TOTAL = 1
-    PH = 2
-    NONE = 3
+    OPEN = 'OPEN'
+    CARBON_TOTAL = 'CARBON_TOTAL'
+    PH = 'PH'
+    NONE = 'NONE'
 
 
 def get_dissociating_ions(tag, reaction_list):

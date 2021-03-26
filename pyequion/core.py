@@ -461,12 +461,12 @@ class EquilibriumSystem:
         self.TK = (
             TK  # Mutating: saving the last temperature for SolutionResult call
         )
-        if self.closing_equation_type == 0:
+        if self.closing_equation_type == 'OPEN':
             pCO2 = args[2]
             logPCO2 = np.log10(pCO2)
-        elif self.closing_equation_type == 1:
+        elif self.closing_equation_type == 'CARBON_TOTAL':
             carbone_total = args[2]
-        elif self.closing_equation_type == 2:
+        elif self.closing_equation_type == 'PH':
             pH = args[2]
         idx = self.idx_control.idx
 
@@ -504,7 +504,7 @@ class EquilibriumSystem:
         sp = self.species
         res = np.empty(idx["size"])
         idx_start = 1
-        if self.closing_equation_type == 0:
+        if self.closing_equation_type == 'OPEN':
             if self.fugacity_calculation == "pr":  # WILL FAIL WITH NUMBA
                 # logfiCO2 = PengRobinson.fugacidade(TK, pCO2)
                 # logfCO2 = np.log10(np.exp(logfiCO2)*pCO2)
@@ -517,14 +517,14 @@ class EquilibriumSystem:
             res[0] = (
                 (sp[idx["CO2"]].logact()) - logfCO2 - logK_H(TK)
             )  # - deltaVmCO2*(pCO2*1e5-1e5)/(R*TK*2.302)
-        elif self.closing_equation_type == 1:
+        elif self.closing_equation_type == 'CARBON_TOTAL':
             # IF WITH DIC, MassBalanceKownList Calculation ALWAYS the first element
             res[0] = carbone_total - self.mass_balances_known[
                 0
             ].mass_balance_just_summation(self.species)
-        elif self.closing_equation_type == 2:  # pH
+        elif self.closing_equation_type == 'PH':  # pH
             res[0] = self.species[idx["H+"]].logact() + pH
-        elif self.closing_equation_type == 3:  # NONE
+        elif self.closing_equation_type == 'NONE':  # NONE
             idx_start = 0
 
         if len(self.reactions) > 0:
@@ -541,7 +541,7 @@ class EquilibriumSystem:
                     self.species, cFeed
                 )
             i_prev += len(self.mass_balances)
-        if i_prev > len(res):
+        if i_prev < len(res):
             res[i_prev] = self.charge_conservation()
         return res
 
