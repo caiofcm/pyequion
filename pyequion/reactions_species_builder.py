@@ -42,6 +42,7 @@ reactionsListIrreversible = [
     {"Na2SO4": -1, "Na+": 2, "HSO4-": 1, "type": "irrev", "id_db": -1},
     {"H2SO4": -1, "H+": 2, "SO4-": 1, "type": "irrev", "id_db": -1},
     {"Al2(SO4)3": -1, "Al+++": 2, "SO4--": 3, "type": "irrev", "id_db": -1},
+    {"HCl": -1, "H+": 1, "Cl-": 1, "type": "irrev", "id_db": -1},
 ]
 
 reactionsListVapourPhase = [
