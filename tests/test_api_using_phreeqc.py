@@ -1059,6 +1059,34 @@ def test_creating_solution_result_from_x():
     assert np.isclose(solution_exp.pH, solution_new.pH)
 
 
+#################################
+####### TDD: Test Driving Development cases
+#################################
+
+def test_pH_as_a_closing_equation():
+
+    comps = {"NaHCO3": 10, "CaCl2": 5.0}
+
+    sol1 = pyequion.solve_solution(comps)
+    pyequion.print_solution(sol1)
+    x_guess = sol1.x
+
+    pH = 8.5
+    solution_comps = pyequion.solve_solution(comps, close_type=ClosingEquationType.PH, pH_fixed=pH)
+    pyequion.print_solution(solution_comps)
+
+    assert(np.isclose(solution_comps.pH, pH))
+
+    pH = 7.9386654148526965
+    solution_comps2 = pyequion.solve_solution(comps, close_type=ClosingEquationType.PH, pH_fixed=pH, x_guess=x_guess)
+    pyequion.print_solution(solution_comps2)
+
+    assert(np.isclose(solution_comps2.pH, pH))
+    assert(np.isclose(solution_comps2.DIC, comps['NaHCO3']*1e-3))
+    return
+
+
+
 ##### Auxiliaries
 def assert_solution(solution, solution_ref, tol=None):
     tol_new = {"pH": 1e-3, "I": 1e-2}

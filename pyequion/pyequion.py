@@ -70,6 +70,7 @@ def solve_solution(
     fixed_elements=None,
     jac=None,
     check_feed_neutrality=True,
+    pH_fixed=None,
 ):
     """The main function for equilibrium calculation in PyEquIon
 
@@ -147,6 +148,10 @@ def solve_solution(
     jac: callable, optional
         A python function for calculating the jacobian of the system,
         by default None
+    pH_fixed : float, optional
+        The value for the pH in the system if option close_type == PH, by default None
+        The convergence for fixed pH is problematic. A x_guess should be given!
+
 
     Returns
     -------
@@ -204,7 +209,7 @@ def solve_solution(
     #         comps_vals = []
 
     args = get_args_from_comps_dict(
-        TC, comps_vals, close_type, co2_partial_pressure, carbon_total
+        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed
     )
     # if vapour_equilibrium_phase:
     #     args = (val_arr, TK, vapour_equilibrium_phase['CO2(g)'])
@@ -260,12 +265,13 @@ def solve_solution_pre_loaded(
     user_solver_function=None,
     # fugacity_calculation='ideal', #'ideal'or 'pr', maybe a UDF
     jac=None,
+    pH_fixed=None,
 ):
 
     # comps_vals = [v * 1e-3 for v in comp_dict.values()]
     comps_vals = [comp_dict[key] * 1e-3 for key in reaction_system.feed_compounds]
     args = get_args_from_comps_dict(
-        TC, comps_vals, close_type, co2_partial_pressure, carbon_total
+        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed
     )
     args_calc_gamma = (args, calc_log_gamma)
     if user_solver_function:
@@ -292,14 +298,16 @@ def setup_system_for_direct_run(
 
 
 def get_args_from_comps_dict(
-    TC, comps_vals, close_type, co2_partial_pressure, carbon_total
-):
+    TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH
+    ):
     TK = TC + 273.15
     val_arr = np.atleast_1d(comps_vals)
     if close_type == ClosingEquationType.OPEN:
         args = (val_arr, TK, co2_partial_pressure)
     elif close_type == ClosingEquationType.CARBON_TOTAL:
         args = (val_arr, TK, carbon_total * 1e-3)
+    elif close_type == ClosingEquationType.PH:
+        args = (val_arr, TK, pH)
     else:
         args = (val_arr, TK, np.nan)
     return args
@@ -813,6 +821,7 @@ def get_solution_from_x(
     carbon_total=0.0,
     co2_partial_pressure=core.pCO2_ref,
     activities_db_file_name=None,
+    pH_fixed=None,
 ) -> SolutionResult:
 
     if isinstance(activity_model_type, str):
@@ -834,7 +843,7 @@ def get_solution_from_x(
     ]
 
     args = get_args_from_comps_dict(
-        TC, comps_vals, close_type, co2_partial_pressure, carbon_total
+        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed
     )
 
     adjust_sys_for_pengrobinson(fugacity_calculation, esys, args)
