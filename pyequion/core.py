@@ -599,6 +599,109 @@ class EquilibriumSystem:
         calc_log_gamma(self.idx_control, self.species, I, TK)
         pass
 
+    def residual_fixed_species(self, x, args, fixed_species, calc_log_gamma):
+        """Calculate the residual for the nonlinear system equilibrium
+
+        Parameters
+        ----------
+        x : float[:]
+            Values of log molal
+        args : tuple
+            Arguments: (c_feed [float[:]], T [float])
+        fixed_species: (numbafied) dict of the fixed species concentrations
+            in log10(c) already
+            for instance, {'Na+':log10(0.25),'Cl-':log10(0.03),...}
+        calc_log_gamma : callable
+            Function for the nonideality calculation
+
+        Returns
+        -------
+        float[:]
+            Residual for the equilibrium system
+        """
+        cFeed = args[0] #self.c_feed, self.TK, self.pCO2
+        TK = args[1] #self.c_feed, self.TK, self.pCO2
+        self.TK = TK #Mutating: saving the last temperature for SolutionResult call
+        if self.closing_equation_type == 0:
+            pCO2 = args[2]
+            logPCO2 = np.log10(pCO2)
+        elif self.closing_equation_type == 1:
+            carbone_total = args[2]
+        elif self.closing_equation_type == 2:
+            pH = args[2]
+        idx = self.idx_control.idx
+        
+        # FIXME: water concentration fixed:
+        self.species[idx['H2O']].logc = 0.0
+        
+        #We are inserting the fixed species here        
+        j_control = 0
+        for i in range(idx['size']): #If we do have the fixed species,
+            if self.species[i].name in fixed_species: #If we do have the fixed species
+                self.species[i].logc = fixed_species[self.species[i].name]
+            else:
+                self.species[i].logc = x[j_control] #If not, we set the rest
+                j_control += 1
+
+        # Forced species:
+        if self.is_there_known_mb:
+            # self.species[idx.Clm].logc = np.log10(2*cFeed[0])
+            for mb in self.mass_balances_known:
+                if mb.use_constant_value:
+                    if mb.idx_feed[0][0] > -1:
+                        mb.known_specie_from_feed(self.species, cFeed)
+                    continue
+                mb.known_specie_from_feed(self.species, cFeed)
+
+        I = self.get_I()
+
+        calc_log_gamma(self.idx_control, self.species, I, TK)
+
+        #FIXME: Remove from residual, put in another method used for initialization
+        #  - Temperature will be fixed for a certain Equilibrium
+        # logK = calculate_log10_equilibrium_constant(TK)
+        # loggammaH20 = loggama_H20(I, TK)
+
+
+        sp = self.species
+        res = np.empty(idx['size']-len(fixed_species))
+        
+        #Now it is just a matter of calculating our residues without mass balance
+        idx_start = 1
+        if self.closing_equation_type == 0:
+            if self.fugacity_calculation == 'pr': #WILL FAIL WITH NUMBA
+                # logfiCO2 = PengRobinson.fugacidade(TK, pCO2)
+                # logfCO2 = np.log10(np.exp(logfiCO2)*pCO2)
+                iCO2g = self.idx_control.idx['CO2(g)']
+                logfCO2 = self.species[iCO2g].logg
+                #GAS FUGACITY IS BEING OBTAINED FROM logg, Consider to modify?
+            else:
+                logfCO2 = logPCO2
+            res[0] = (sp[idx['CO2']].logact()) - logfCO2 - logK_H(TK)
+        elif self.closing_equation_type == 1:
+            # IF WITH DIC, MassBalanceKownList Calculation ALWAYS the first element
+            res[0] = carbone_total - self.mass_balances_known[0].mass_balance_just_summation(
+                self.species
+            )
+        elif self.closing_equation_type == 2: #pH
+            res[0] = self.species[idx['H+']].logact() + pH
+        elif self.closing_equation_type == 3: #NONE
+            idx_start = 0
+        
+        if len(self.reactions) > 0:
+            res[idx_start:idx_start+len(self.reactions)] = [
+                reac.eq(sp, TK) for reac in self.reactions
+            ]
+            i_prev = idx_start + len(self.reactions)
+        else:
+            i_prev = 0
+        
+        #Notice that there is no mass balance here
+        if i_prev < len(res):
+            res[i_prev] = self.charge_conservation()
+
+        return res
+
     def charge_conservation(self):
         """Residual for charge conservation
 
