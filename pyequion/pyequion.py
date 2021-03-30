@@ -150,7 +150,9 @@ def solve_solution(
         by default None
     pH_fixed : float, optional
         The value for the pH in the system if option close_type == PH, by default None
-        The convergence for fixed pH is problematic. A x_guess should be given!
+        Setting a fixed pH requires the definition of `element_mass_balance`.
+        This is because fixing the pH a mass balance should be "free".
+        For instance, NaOH + HCl with a fixed pH, which of the feed will be adjusted to met the given pH ?
 
 
     Returns
@@ -195,6 +197,8 @@ def solve_solution(
             check_neutrality, 0.0
         ), "Error: Feed Neutrality should be zero!"
 
+    if pH_fixed is not None and element_mass_balance is None:
+        raise ValueError('For fixed pH calculation the element_mass_balance should be provided.')
     # if reaction_system is None: FIXME
     #     feed_compounds = [k for k in comp_dict.keys()]
     #     comps_vals = np.array([v*1e-3 for v in comp_dict.values()])

@@ -748,6 +748,7 @@ def create_list_of_mass_balances_engine(
             ClosingEquationType.NONE,
             ClosingEquationType.CARBON_TOTAL,
             ClosingEquationType.OPEN,
+            ClosingEquationType.PH, #PAREI AQUI CHECKME
         ]:  # CARBON_TOTAL STAYS OR NOT?
             # Can perform automatic mass balance detection
             list_elements_in_tags = get_elements_and_their_coefs(feed_list)
