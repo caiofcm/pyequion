@@ -8,3 +8,9 @@ sol3 = pyequion.solve_solution(
     {"CaSO4": 100, "NaCl": 100}, sys_eq, activity_model_type="bromley"
 )
 pyequion.print_solution(sol3)
+
+
+sol3 = pyequion.solve_solution(
+    {"CaSO4": 100, "NaCl": 100}, sys_eq, show_consistency_checking=True
+)
+pyequion.print_solution(sol3)

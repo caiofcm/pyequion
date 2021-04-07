@@ -71,6 +71,7 @@ def solve_solution(
     jac=None,
     check_feed_neutrality=True,
     pH_fixed=None,
+    show_consistency_checking=False,
 ):
     """The main function for equilibrium calculation in PyEquIon
 
@@ -153,7 +154,8 @@ def solve_solution(
         Setting a fixed pH requires the definition of `element_mass_balance`.
         This is because fixing the pH a mass balance should be "free".
         For instance, NaOH + HCl with a fixed pH, which of the feed will be adjusted to met the given pH ?
-
+    show_consistency_checking: bool, option
+        Show information regarding the system consistency for nonlinear solution
 
     Returns
     -------
@@ -235,6 +237,9 @@ def solve_solution(
         )
     else:
         sys_eq = reaction_system
+
+    if show_consistency_checking:
+        check_system_consistency(sys_eq, True)
 
     # if fugacity_calculation == 'pr':
     #     sys_eq.fugacity_calculation = fugacity_calculation #WILL FAIL IN NUMBA
@@ -862,6 +867,50 @@ def get_solution_from_x(
     sol = calculate_properties_non_jitted(esys)
 
     return sol
+
+
+
+def check_system_consistency(sys_eq: EquilibriumSystem, verbose=False):
+    """
+
+    Determine the system nonlinear equation system consistency
+
+    n_species - n_equations = 0
+
+    n_equations = (electro-neutrality) + (reactions) + (mass-balances) + (closing-equations)
+
+
+    Parameters
+    ----------
+    sys_eq : pyequion.EquilibriumSystem
+        [description]
+    verbose : bool, optional
+        [description], by default False
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+
+
+    n_species = len(sys_eq.species) - 1 #removing water
+
+    n_reactions = len(sys_eq.reactions)
+
+    dic_out = {
+        'N_species': n_species,
+        'N_reactions': n_reactions,
+        'GL_before_mb_specs': n_species - n_reactions - 1
+    }
+
+    if verbose:
+        print('Consistency Check:')
+        print('Number of unknown species: {}'.format(n_species))
+        print('Number of equilibrium reactions: {}'.format(n_reactions))
+        print('Degree of freedom before Mass balance/Specifications: {}'.format(dic_out['GL_before_mb_specs']))
+
+    return dic_out
 
 
 #################################################
