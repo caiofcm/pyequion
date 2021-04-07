@@ -265,6 +265,50 @@ DUMMY_EqREACTION = EqReaction(
 # --------------------------------------------
 
 
+def calc_alkalinity_from_vector(x, idx):
+
+    ohm = 10.0**x[idx['OH-']] if 'OH-' in idx else 0.0
+    hco3m = 10.0**x[idx['HCO3-']] if 'HCO3-' in idx else 0.0
+    co3mm = 10.0**x[idx['CO3--']] if 'CO3--' in idx else 0.0
+    hsm = 10.0**x[idx['HS-']] if 'HS-' in idx else 0.0
+    smm = 10.0**x[idx['S--']] if 'S--' in idx else 0.0
+    am = 10.0**x[idx['A-']] if 'A-' in idx else 0.0
+    hp = 10.0**x[idx['H+']] if 'H+' in idx else 0.0
+
+    alkalinity = (
+        ohm+
+        hco3m+
+        2*co3mm+
+        hsm+
+        2*smm+
+        am-
+        hp
+    )
+
+    return alkalinity
+
+
+def calc_alkalinity_from_concs(concs):
+    """
+    Calculates the alkalinity based on a pre set of species.
+
+    Obs: Aqion calculates the alkalinity from conservative ions balance (ref: https://www.aqion.de/site/149#fn:1)
+    and before the speciation calculation.
+    Todo: generic organic acid as A- ??"""
+
+    alkalinity = (
+        concs.get('OH-', 0.0) +
+        concs.get('HCO3-', 0.0) +
+        2*concs.get('CO3--', 0.0) +
+        concs.get('HS-', 0.0) +
+        2*concs.get('S--', 0.0) +
+        concs.get('A-', 0.0) -
+        concs.get('H+', 0.0)
+    )
+
+    return alkalinity
+
+
 class SolutionResult:
     """Final equilibrium solution representation
 
@@ -337,7 +381,7 @@ class SolutionResult:
         self.concentrations = _concentrations
         self.x = x
         self.successfull = successfull
-
+        self.alkalinity = calc_alkalinity_from_concs(self.concentrations)
         pass
 
 
@@ -468,6 +512,8 @@ class EquilibriumSystem:
             carbone_total = args[2]
         elif self.closing_equation_type == 'PH':
             pH = args[2]
+        elif self.closing_equation_type == 'ALKALINITY':
+            alkalinity = args[2]
         idx = self.idx_control.idx
 
         # FIXME: water concentration fixed:
@@ -522,8 +568,11 @@ class EquilibriumSystem:
             res[0] = carbone_total - self.mass_balances_known[
                 0
             ].mass_balance_just_summation(self.species)
-        elif self.closing_equation_type == 'PH':  # pH
+        elif self.closing_equation_type == 'PH':
             res[0] = self.species[idx["H+"]].logact() + pH
+        elif self.closing_equation_type == 'ALKALINITY':
+            alk = calc_alkalinity_from_vector(x, idx)
+            res[0] = alk - alkalinity
         elif self.closing_equation_type == 'NONE':  # NONE
             idx_start = 0
 

@@ -72,6 +72,7 @@ def solve_solution(
     check_feed_neutrality=True,
     pH_fixed=None,
     show_consistency_checking=False,
+    alkalinity_fixed=None,
 ):
     """The main function for equilibrium calculation in PyEquIon
 
@@ -156,7 +157,9 @@ def solve_solution(
         For instance, NaOH + HCl with a fixed pH, which of the feed will be adjusted to met the given pH ?
     show_consistency_checking: bool, option
         Show information regarding the system consistency for nonlinear solution
-
+    alkalinity_fixed: float, optional
+        The value for the alkalinity for the system. Require caution on setting the
+        `element_mass_balance` property to correctly specify the system of equations
     Returns
     -------
     SolutionResult
@@ -201,6 +204,9 @@ def solve_solution(
 
     if pH_fixed is not None and element_mass_balance is None:
         raise ValueError('For fixed pH calculation the element_mass_balance should be provided.')
+    if alkalinity_fixed is not None and element_mass_balance is None:
+        raise ValueError('For fixed alkalinity calculation the element_mass_balance should be provided.')
+
     # if reaction_system is None: FIXME
     #     feed_compounds = [k for k in comp_dict.keys()]
     #     comps_vals = np.array([v*1e-3 for v in comp_dict.values()])
@@ -215,7 +221,7 @@ def solve_solution(
     #         comps_vals = []
 
     args = get_args_from_comps_dict(
-        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed
+        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed, alkalinity_fixed
     )
     # if vapour_equilibrium_phase:
     #     args = (val_arr, TK, vapour_equilibrium_phase['CO2(g)'])
@@ -275,12 +281,13 @@ def solve_solution_pre_loaded(
     # fugacity_calculation='ideal', #'ideal'or 'pr', maybe a UDF
     jac=None,
     pH_fixed=None,
+    alkalinity_fixed=None,
 ):
 
     # comps_vals = [v * 1e-3 for v in comp_dict.values()]
     comps_vals = [comp_dict[key] * 1e-3 for key in reaction_system.feed_compounds]
     args = get_args_from_comps_dict(
-        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed
+        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed, alkalinity_fixed
     )
     args_calc_gamma = (args, calc_log_gamma)
     if user_solver_function:
@@ -307,7 +314,7 @@ def setup_system_for_direct_run(
 
 
 def get_args_from_comps_dict(
-    TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH
+    TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH, alkalinity
     ):
     TK = TC + 273.15
     val_arr = np.atleast_1d(comps_vals)
@@ -317,6 +324,8 @@ def get_args_from_comps_dict(
         args = (val_arr, TK, carbon_total * 1e-3)
     elif close_type == ClosingEquationType.PH:
         args = (val_arr, TK, pH)
+    elif close_type == ClosingEquationType.ALKALINITY:
+        args = (val_arr, TK, alkalinity)
     else:
         args = (val_arr, TK, np.nan)
     return args
@@ -660,6 +669,7 @@ def print_solution(solution, conc_and_activity=False):
     print("\tsc = {:.5f} uS/cm".format(solution.sc * 1e6))
     print("\tI = {:.5f} mmol/L".format(solution.I * 1e3))
     print("\tDIC = {:.5f} mmol/L".format(solution.DIC * 1e3))
+    print("\tAlkalinity = {:.5f} mmol/L".format(solution.alkalinity * 1e3))
     if solution.saturation_index:
         print("Saturation Index:")
         [print(f"\t{k}: {v}") for k, v in solution.saturation_index.items()]
@@ -831,6 +841,7 @@ def get_solution_from_x(
     co2_partial_pressure=core.pCO2_ref,
     activities_db_file_name=None,
     pH_fixed=None,
+    alkalinity_fixed=None,
 ) -> SolutionResult:
 
     if isinstance(activity_model_type, str):
@@ -852,7 +863,7 @@ def get_solution_from_x(
     ]
 
     args = get_args_from_comps_dict(
-        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed
+        TC, comps_vals, close_type, co2_partial_pressure, carbon_total, pH_fixed, alkalinity_fixed
     )
 
     adjust_sys_for_pengrobinson(fugacity_calculation, esys, args)

@@ -1072,13 +1072,23 @@ def test_pH_as_a_closing_equation():
     x_guess = sol1.x
 
     pH = 8.5
-    solution_comps = pyequion.solve_solution(comps, close_type=ClosingEquationType.PH, pH_fixed=pH)
+    solution_comps = pyequion.solve_solution(comps,
+        close_type=ClosingEquationType.PH,
+        pH_fixed=pH,
+        element_mass_balance=['Na']
+    )
     pyequion.print_solution(solution_comps)
 
     assert(np.isclose(solution_comps.pH, pH))
 
     pH = 7.9386654148526965
-    solution_comps2 = pyequion.solve_solution(comps, close_type=ClosingEquationType.PH, pH_fixed=pH, x_guess=x_guess)
+    solution_comps2 = pyequion.solve_solution(
+        comps,
+        close_type=ClosingEquationType.PH,
+        pH_fixed=pH,
+        x_guess=x_guess,
+        element_mass_balance=['Na'],
+    )
     pyequion.print_solution(solution_comps2)
 
     assert(np.isclose(solution_comps2.pH, pH))

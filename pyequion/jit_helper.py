@@ -142,6 +142,8 @@ def jit_compile_functions():
         ("concentrations", numba.typeof(d_scalar)),
         ("x", numba.float64[:]),  # Numerical solution
         ("successfull", numba.boolean),
+        ("alkalinity", numba.float64),
+
     ]
 
     # global core.SolutionResult

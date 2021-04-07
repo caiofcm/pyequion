@@ -11,12 +11,14 @@ class ClosingEquationType:
     - CARBON_TOTAL: Special case of a mass balance with element C: allow the setting of total carbone (different from the input compounds)
     - PH: fix the pH
     - NONE: Let the package provide all the equations (obatined from the input file)
+    - ALKALINITY: Fix the alkalinity
     """
 
     OPEN = 'OPEN'
     CARBON_TOTAL = 'CARBON_TOTAL'
     PH = 'PH'
     NONE = 'NONE'
+    ALKALINITY = 'ALKALINITY'
 
 
 def get_dissociating_ions(tag, reaction_list):
