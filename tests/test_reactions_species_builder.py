@@ -1415,6 +1415,14 @@ def test_engine_caco3_cacl2_pitzer():
 
 #     assert True
 
+def test_consistency_check():
+
+    sys_eq = pyequion.create_equilibrium(['NaOH', 'HCl'])
+    dict_consistency = pyequion.check_system_consistency(sys_eq, True)
+    assert dict_consistency['GL_before_mb_specs'] == 2
+
+
+
 # --------------------------------------------
 # 	MINOR TESTS
 # --------------------------------------------
