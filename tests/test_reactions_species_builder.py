@@ -1019,6 +1019,7 @@ def test_engine_water_co2_solve_fixed_pH_closing_equation():
     initial_feed_mass_balance = None
     element_mass_balance = []
     closing_equation_type = ClosingEquationType.PH
+    # closing_equation_type=ClosingEquationType.NONE
 
     sys_eq = create_equilibrium(
         feed_compounds,
