@@ -10,7 +10,7 @@ LICENSE = HERE / "LICENSE.md"  # .read_text()
 
 setup(
     name="pyequion",
-    version="0.0.5.5",
+    version="0.0.5.6",
     description="Chemical equilibrium for electrolytes in pure python",
     # packages=["pyequion"],
     url="https://github.com/caiofcm/pyequion",
