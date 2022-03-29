@@ -12,7 +12,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/caiofcm/pyequion/badge.svg?branch=master)](https://coveralls.io/github/caiofcm/pyequion?branch=master)
 [![Build Status](https://travis-ci.org/caiofcm/pyequion.svg?branch=master)](https://travis-ci.org/caiofcm/pyequion)
 
-# PyEquIon
+# PyEquIon (deprecated)
+
+[DEPRECATED] A new version is provided at: https://github.com/pyequion/pyequion2
 
 A pure python implementation for electrolytes chemical equilibrium.
 
